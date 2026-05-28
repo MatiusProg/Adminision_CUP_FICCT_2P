@@ -202,6 +202,3 @@ Core features:
 - Tables: responsive with overflow-x-auto on mobile
 - Forms: card container (rounded-3xl shadow-card p-8), grid layout for field groups
 - Design: professional, clean, responsive (mobile-first)
-
-Claude: You are free to propose improvements over these patterns if you see
-a better approach for this specific project. These are guidelines, not strict rules.
