@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
 			'role' => \App\Http\Middleware\RoleMiddleware::class,
 		]);
+        // Tratar TODAS las rutas /api/* como stateless: sin redirección a 'login'.
+        // Si no hay token, responde 401 JSON en vez de intentar redirigir.
+        $middleware->redirectGuestsTo(fn () => null);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
