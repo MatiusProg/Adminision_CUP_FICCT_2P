@@ -17,12 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
     })
-    -->withExceptions(function (Exceptions $exceptions): void {
-        // Para rutas de API: si el usuario no está autenticado, devolver 401 JSON
-        // en vez de intentar redirigir a una ruta web 'login' que no existe.
+    ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, $request) {
             if ($request->is('api/*')) {
                 return response()->json(['message' => 'No autenticado.'], 401);
             }
         });
-    })
+    })->create();
