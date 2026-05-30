@@ -16,6 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
+
+        // Las rutas API nunca redirigen a 'login'; responden 401 JSON.
+        $middleware->redirectGuestsTo(function ($request) {
+            if (! $request->expectsJson() && ! $request->is('api/*')) {
+                return route('login');
+            }
+            return null;
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, $request) {
