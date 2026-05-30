@@ -12,13 +12,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Alias del control de acceso por rol
         $middleware->alias([
-			'role' => \App\Http\Middleware\RoleMiddleware::class,
-		]);
-        // Tratar TODAS las rutas /api/* como stateless: sin redirección a 'login'.
-        // Si no hay token, responde 401 JSON en vez de intentar redirigir.
-        $middleware->redirectGuestsTo(fn () => null);
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
-    })->create();
+    -->withExceptions(function (Exceptions $exceptions): void {
+        // Para rutas de API: si el usuario no está autenticado, devolver 401 JSON
+        // en vez de intentar redirigir a una ruta web 'login' que no existe.
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'No autenticado.'], 401);
+            }
+        });
+    })
