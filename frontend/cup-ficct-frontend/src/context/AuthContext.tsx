@@ -47,8 +47,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     apiClient
-      .get<User>("/auth/me")
-      .then((u) => setUser(u))
+      .get<{ data: User }>("/auth/me")
+      .then((res) => setUser(res.data))
       .catch(() => clearToken())
       .finally(() => setLoading(false));
   }, []);
