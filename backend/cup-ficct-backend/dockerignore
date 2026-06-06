@@ -1,0 +1,21 @@
+# Archivos y carpetas que NO deben copiarse al contenedor Docker.
+# Reduce el tamaño de la imagen y evita pisar configuración.
+
+/node_modules
+/vendor
+/.git
+/.github
+.env
+.env.*
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/tests
+/.idea
+/.vscode
+*.md
+Dockerfile
+.dockerignore
+docker-compose.yml
