@@ -1,13 +1,16 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+
+/* Fuentes distintivas: Sora para títulos (tech, con carácter), Outfit para cuerpo (legible, moderna). */
+@import "@fontsource-variable/sora";
+@import "@fontsource-variable/outfit";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
+    --font-heading: 'Sora Variable', sans-serif;
+    --font-sans: 'Outfit Variable', sans-serif;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,83 +51,121 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* =========================================================================
+   MODO CLARO — fondos claros con cian teal como primario.
+   Paleta inspirada en la identidad FICCT (azul profundo + cian + rojo escudo).
+   ========================================================================= */
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
+    --background: oklch(0.985 0.005 220);      /* casi blanco, leve tinte frío */
+    --foreground: oklch(0.21 0.04 245);        /* azul muy oscuro (texto) */
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
+    --card-foreground: oklch(0.21 0.04 245);
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --popover-foreground: oklch(0.21 0.04 245);
+    --primary: oklch(0.58 0.11 215);           /* cian/teal — color de marca */
+    --primary-foreground: oklch(0.99 0.01 220);
+    --secondary: oklch(0.95 0.02 220);         /* azul muy claro */
+    --secondary-foreground: oklch(0.28 0.05 245);
+    --muted: oklch(0.96 0.01 220);
+    --muted-foreground: oklch(0.52 0.03 240);
+    --accent: oklch(0.92 0.05 200);            /* cian claro para hovers */
+    --accent-foreground: oklch(0.25 0.06 240);
+    --destructive: oklch(0.52 0.21 22);        /* rojo del escudo (borrar) */
+    --border: oklch(0.9 0.015 225);
+    --input: oklch(0.9 0.015 225);
+    --ring: oklch(0.58 0.11 215);              /* foco = primario */
+    --chart-1: oklch(0.58 0.11 215);
+    --chart-2: oklch(0.45 0.08 235);
+    --chart-3: oklch(0.7 0.13 195);
+    --chart-4: oklch(0.52 0.21 22);
+    --chart-5: oklch(0.35 0.07 250);
+    --radius: 0.75rem;
+    --sidebar: oklch(0.22 0.045 250);          /* sidebar oscuro aun en claro (contraste) */
+    --sidebar-foreground: oklch(0.92 0.02 210);
+    --sidebar-primary: oklch(0.62 0.13 205);
+    --sidebar-primary-foreground: oklch(0.99 0.01 220);
+    --sidebar-accent: oklch(0.3 0.06 245);
+    --sidebar-accent-foreground: oklch(0.95 0.02 200);
+    --sidebar-border: oklch(0.32 0.05 248);
+    --sidebar-ring: oklch(0.62 0.13 205);
 }
 
+/* =========================================================================
+   MODO OSCURO — azul profundo del escudo como fondo, cian brillante de acento.
+   ========================================================================= */
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    --background: oklch(0.18 0.04 250);        /* #0D1A2F aprox — azul casi negro */
+    --foreground: oklch(0.95 0.02 205);        /* #E5F9F8 aprox */
+    --card: oklch(0.24 0.045 248);             /* #17364F aprox — azul petróleo */
+    --card-foreground: oklch(0.95 0.02 205);
+    --popover: oklch(0.24 0.045 248);
+    --popover-foreground: oklch(0.95 0.02 205);
+    --primary: oklch(0.7 0.13 195);            /* cian brillante */
+    --primary-foreground: oklch(0.18 0.04 250);
+    --secondary: oklch(0.3 0.05 248);
+    --secondary-foreground: oklch(0.95 0.02 205);
+    --muted: oklch(0.28 0.045 248);
+    --muted-foreground: oklch(0.68 0.04 210);
+    --accent: oklch(0.34 0.07 240);
+    --accent-foreground: oklch(0.92 0.04 195);
+    --destructive: oklch(0.62 0.2 22);         /* rojo escudo, algo más brillante en oscuro */
+    --border: oklch(0.4 0.04 240 / 35%);
+    --input: oklch(0.5 0.04 240 / 30%);
+    --ring: oklch(0.7 0.13 195);
+    --chart-1: oklch(0.7 0.13 195);
+    --chart-2: oklch(0.6 0.1 220);
+    --chart-3: oklch(0.78 0.14 185);
+    --chart-4: oklch(0.62 0.2 22);
+    --chart-5: oklch(0.5 0.08 240);
+    --sidebar: oklch(0.15 0.035 252);          /* aún más oscuro que el fondo */
+    --sidebar-foreground: oklch(0.9 0.025 208);
+    --sidebar-primary: oklch(0.7 0.13 195);
+    --sidebar-primary-foreground: oklch(0.15 0.035 252);
+    --sidebar-accent: oklch(0.26 0.05 248);
+    --sidebar-accent-foreground: oklch(0.92 0.04 195);
+    --sidebar-border: oklch(0.4 0.04 240 / 30%);
+    --sidebar-ring: oklch(0.7 0.13 195);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+    font-feature-settings: "ss01", "cv01";
+  }
   html {
     @apply font-sans;
-    }
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+  }
+}
+
+/* =========================================================================
+   Utilidades de marca reutilizables en todas las páginas.
+   ========================================================================= */
+@layer utilities {
+  /* Fondo atmosférico con resplandor cian (para login y headers destacados). */
+  .bg-ficct-glow {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, oklch(0.7 0.13 195 / 0.18), transparent),
+      radial-gradient(ellipse 60% 50% at 100% 100%, oklch(0.6 0.1 220 / 0.12), transparent);
+  }
+  /* Tarjeta con borde sutil y sombra suave (reemplaza el card plano). */
+  .card-elevated {
+    box-shadow:
+      0 1px 2px oklch(0.2 0.04 250 / 0.08),
+      0 8px 24px oklch(0.2 0.04 250 / 0.08);
+  }
+  /* Texto con degradado cian para títulos destacados. */
+  .text-gradient-ficct {
+    background: linear-gradient(135deg, oklch(0.7 0.13 195), oklch(0.55 0.1 225));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }

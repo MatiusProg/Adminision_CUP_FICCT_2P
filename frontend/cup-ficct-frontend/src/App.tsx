@@ -1,9 +1,12 @@
 // Enrutado principal de la aplicación. Define rutas públicas, protegidas por
-// sesión y protegidas por rol, todas envueltas en el AuthProvider.
+// sesión y protegidas por rol. Envuelto en los providers de tema, autenticación
+// y confirmación.
 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { ConfirmProvider } from "@/context/useConfirm";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import { LoginPage } from "@/pages/Auth/LoginPage";
@@ -27,7 +30,7 @@ function SinPermiso() {
   return (
     <div className="flex h-full items-center justify-center text-center">
       <div>
-        <h1 className="text-xl font-bold">Sin permiso</h1>
+        <h1 className="font-heading text-xl font-bold">Sin permiso</h1>
         <p className="text-muted-foreground">No tiene acceso a esta sección.</p>
       </div>
     </div>
@@ -36,94 +39,98 @@ function SinPermiso() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Toaster position="top-right" richColors />
-        <Routes>
-          {/* Públicas */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/pago/exito" element={<PagoExitoPage />} />
-          <Route path="/pago/cancelado" element={<PagoCanceladoPage />} />
+    <ThemeProvider>
+      <AuthProvider>
+        <ConfirmProvider>
+          <BrowserRouter>
+            <Toaster position="top-right" richColors />
+            <Routes>
+              {/* Públicas */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/pago/exito" element={<PagoExitoPage />} />
+              <Route path="/pago/cancelado" element={<PagoCanceladoPage />} />
 
-          {/* Protegidas con layout */}
-          <Route
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/" element={<HomeRedirect />} />
-            <Route path="/sin-permiso" element={<SinPermiso />} />
+              {/* Protegidas con layout */}
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="/" element={<HomeRedirect />} />
+                <Route path="/sin-permiso" element={<SinPermiso />} />
 
-            {/* Dashboard: admin y autoridad */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute roles={["admin", "autoridad"]}>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
+                {/* Dashboard: admin y autoridad */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute roles={["admin", "autoridad"]}>
+                      <DashboardPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-            {/* Postulantes: lectura admin/coordinador/autoridad */}
-            <Route
-              path="/postulantes"
-              element={
-                <ProtectedRoute roles={["admin", "coordinador_academico", "autoridad"]}>
-                  <PostulanteListPage />
-                </ProtectedRoute>
-              }
-            />
-            {/* Crear/editar: admin/coordinador */}
-            <Route
-              path="/postulantes/nuevo"
-              element={
-                <ProtectedRoute roles={["admin", "coordinador_academico"]}>
-                  <PostulanteFormPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/postulantes/:id/editar"
-              element={
-                <ProtectedRoute roles={["admin", "coordinador_academico"]}>
-                  <PostulanteFormPage />
-                </ProtectedRoute>
-              }
-            />
+                {/* Postulantes: lectura admin/coordinador/autoridad */}
+                <Route
+                  path="/postulantes"
+                  element={
+                    <ProtectedRoute roles={["admin", "coordinador_academico", "autoridad"]}>
+                      <PostulanteListPage />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* Crear/editar: admin/coordinador */}
+                <Route
+                  path="/postulantes/nuevo"
+                  element={
+                    <ProtectedRoute roles={["admin", "coordinador_academico"]}>
+                      <PostulanteFormPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/postulantes/:id/editar"
+                  element={
+                    <ProtectedRoute roles={["admin", "coordinador_academico"]}>
+                      <PostulanteFormPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-            {/* Admin */}
-            <Route
-              path="/carreras"
-              element={
-                <ProtectedRoute roles={["admin"]}>
-                  <CarrerasPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/gestiones"
-              element={
-                <ProtectedRoute roles={["admin"]}>
-                  <GestionesPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/configuracion"
-              element={
-                <ProtectedRoute roles={["admin"]}>
-                  <ConfiguracionPage />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
+                {/* Admin */}
+                <Route
+                  path="/carreras"
+                  element={
+                    <ProtectedRoute roles={["admin"]}>
+                      <CarrerasPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/gestiones"
+                  element={
+                    <ProtectedRoute roles={["admin"]}>
+                      <GestionesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/configuracion"
+                  element={
+                    <ProtectedRoute roles={["admin"]}>
+                      <ConfiguracionPage />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
 
-          {/* Cualquier otra ruta */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+              {/* Cualquier otra ruta */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </ConfirmProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
