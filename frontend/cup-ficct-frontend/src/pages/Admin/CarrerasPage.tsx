@@ -1,8 +1,10 @@
 // Gestión de carreras (UC-10): tabla + edición inline del cupo máximo.
 
 import { useEffect, useState } from "react";
+import { GraduationCap, Save } from "lucide-react";
 import { toast } from "sonner";
 import { carrerasService, type Carrera } from "@/services/carrerasService";
+import { PageHeader, ContentCard, SkeletonRows } from "@/components/ui-shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,8 +19,8 @@ import {
 export function CarrerasPage() {
   const [carreras, setCarreras] = useState<Carrera[]>([]);
   const [loading, setLoading] = useState(true);
-  // Edición del cupo por fila (id -> nuevo valor temporal).
   const [editCupo, setEditCupo] = useState<Record<number, number>>({});
+  const [saving, setSaving] = useState<Record<number, boolean>>({});
 
   async function cargar() {
     setLoading(true);
@@ -32,53 +34,60 @@ export function CarrerasPage() {
     }
   }
 
-  useEffect(() => {
-    cargar();
-  }, []);
+  useEffect(() => { cargar(); }, []);
 
   async function guardarCupo(c: Carrera) {
     const nuevo = editCupo[c.id];
     if (nuevo === undefined || nuevo === c.cupo_maximo) return;
+    setSaving((s) => ({ ...s, [c.id]: true }));
     try {
       await carrerasService.update(c.id, { cupo_maximo: nuevo });
-      toast.success(`Cupo de ${c.nombre} actualizado.`);
+      toast.success(`Cupo de ${c.nombre} actualizado a ${nuevo}.`);
       cargar();
     } catch {
       toast.error("No se pudo actualizar el cupo.");
+    } finally {
+      setSaving((s) => ({ ...s, [c.id]: false }));
     }
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Carreras</h1>
+      <PageHeader
+        title="Carreras"
+        description="Catálogo de carreras de la FICCT y sus cupos máximos por gestión."
+      />
 
-      <div className="overflow-x-auto rounded-2xl border bg-card">
+      <ContentCard>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Cupo máximo</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+            <TableRow className="bg-muted/40 hover:bg-muted/40">
+              <TableHead className="font-semibold">Código</TableHead>
+              <TableHead className="font-semibold">Carrera</TableHead>
+              <TableHead className="font-semibold">Cupo máximo</TableHead>
+              <TableHead className="text-right font-semibold">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow>
-                <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
-                  Cargando...
-                </TableCell>
-              </TableRow>
+              <SkeletonRows rows={4} cols={4} />
             ) : (
               carreras.map((c) => (
-                <TableRow key={c.id}>
-                  <TableCell className="font-medium">{c.codigo}</TableCell>
-                  <TableCell>{c.nombre}</TableCell>
+                <TableRow key={c.id} className="transition-colors hover:bg-muted/30">
+                  <TableCell>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                      <GraduationCap className="h-3.5 w-3.5" />
+                      {c.codigo}
+                    </span>
+                  </TableCell>
+                  <TableCell className="font-medium">{c.nombre}</TableCell>
                   <TableCell>
                     <Input
+                      id={`cupo-${c.id}`}
+                      name={`cupo_${c.codigo}`}
                       type="number"
                       min={1}
-                      className="w-28"
+                      className="h-9 w-28"
                       defaultValue={c.cupo_maximo}
                       onChange={(e) =>
                         setEditCupo((prev) => ({ ...prev, [c.id]: Number(e.target.value) }))
@@ -86,9 +95,16 @@ export function CarrerasPage() {
                     />
                   </TableCell>
                   <TableCell>
-                    <div className="flex flex-wrap justify-end gap-2">
-                      <Button variant="outline" size="sm" onClick={() => guardarCupo(c)}>
-                        Guardar
+                    <div className="flex justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => guardarCupo(c)}
+                        disabled={saving[c.id]}
+                        className="h-9 hover:bg-primary/10 hover:text-primary hover:border-primary/30"
+                      >
+                        <Save className="mr-1.5 h-3.5 w-3.5" />
+                        {saving[c.id] ? "Guardando..." : "Guardar"}
                       </Button>
                     </div>
                   </TableCell>
@@ -97,7 +113,7 @@ export function CarrerasPage() {
             )}
           </TableBody>
         </Table>
-      </div>
+      </ContentCard>
     </div>
   );
 }

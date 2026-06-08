@@ -1,12 +1,14 @@
 // Gestión de períodos académicos: lista, activar y avanzar fase.
 
 import { useEffect, useState } from "react";
+import { Star, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import {
   gestionesService,
   type Gestion,
   type EstadoGestion,
 } from "@/services/gestionesService";
+import { PageHeader, ContentCard, SkeletonRows } from "@/components/ui-shared";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -23,8 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
-// Etiquetas en español de cada fase.
 const faseLabels: Record<EstadoGestion, string> = {
   inscripciones_abiertas: "Inscripciones abiertas",
   cup_iniciado: "CUP iniciado",
@@ -34,11 +36,22 @@ const faseLabels: Record<EstadoGestion, string> = {
   finalizada: "Finalizada",
 };
 
+// Color de la fase para el badge visual.
+const faseColors: Record<EstadoGestion, string> = {
+  inscripciones_abiertas: "text-emerald-600 bg-emerald-500/10 border-emerald-500/20",
+  cup_iniciado: "text-primary bg-primary/10 border-primary/20",
+  grupos_generados: "text-primary bg-primary/10 border-primary/20",
+  docentes_asignados: "text-amber-600 bg-amber-500/10 border-amber-500/20",
+  en_curso: "text-amber-600 bg-amber-500/10 border-amber-500/20",
+  finalizada: "text-muted-foreground bg-muted border-border",
+};
+
 const FASES = Object.keys(faseLabels) as EstadoGestion[];
 
 export function GestionesPage() {
   const [gestiones, setGestiones] = useState<Gestion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activando, setActivando] = useState<number | null>(null);
 
   async function cargar() {
     setLoading(true);
@@ -52,17 +65,18 @@ export function GestionesPage() {
     }
   }
 
-  useEffect(() => {
-    cargar();
-  }, []);
+  useEffect(() => { cargar(); }, []);
 
   async function activar(g: Gestion) {
+    setActivando(g.id);
     try {
       await gestionesService.activar(g.id);
       toast.success(`Gestión ${g.codigo} activada.`);
       cargar();
     } catch {
       toast.error("No se pudo activar la gestión.");
+    } finally {
+      setActivando(null);
     }
   }
 
@@ -71,64 +85,94 @@ export function GestionesPage() {
       await gestionesService.updateEstado(g.id, estado);
       toast.success(`Fase de ${g.codigo} actualizada.`);
       cargar();
-    } catch (err) {
-      // El backend rechaza retrocesos de fase con 422.
+    } catch {
       toast.error("No se pudo cambiar la fase (no se permite retroceder).");
     }
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Gestiones</h1>
+      <PageHeader
+        title="Gestiones"
+        description="Períodos académicos del CUP. Solo puede haber una gestión activa a la vez."
+      />
 
-      <div className="overflow-x-auto rounded-2xl border bg-card">
+      <ContentCard>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Año</TableHead>
-              <TableHead>Período</TableHead>
-              <TableHead>Fase</TableHead>
-              <TableHead>Activa</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+            <TableRow className="bg-muted/40 hover:bg-muted/40">
+              <TableHead className="font-semibold">Código</TableHead>
+              <TableHead className="font-semibold">Año</TableHead>
+              <TableHead className="font-semibold">Período</TableHead>
+              <TableHead className="font-semibold">Fase actual</TableHead>
+              <TableHead className="font-semibold">Estado</TableHead>
+              <TableHead className="text-right font-semibold">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                  Cargando...
-                </TableCell>
-              </TableRow>
+              <SkeletonRows rows={3} cols={6} />
             ) : (
               gestiones.map((g) => (
-                <TableRow key={g.id}>
-                  <TableCell className="font-medium">{g.codigo}</TableCell>
+                <TableRow
+                  key={g.id}
+                  className={cn(
+                    "transition-colors hover:bg-muted/30",
+                    g.es_actual && "bg-primary/5 hover:bg-primary/8"
+                  )}
+                >
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {g.es_actual && (
+                        <Star className="h-3.5 w-3.5 fill-primary text-primary" />
+                      )}
+                      <span className="font-heading font-bold">{g.codigo}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>{g.anio}</TableCell>
                   <TableCell>{g.periodo}</TableCell>
                   <TableCell>
+                    {/* Select para avanzar la fase */}
                     <Select
                       value={g.estado}
                       onValueChange={(v) => cambiarFase(g, v as EstadoGestion)}
                     >
-                      <SelectTrigger className="w-[200px]">
+                      <SelectTrigger className="h-8 w-[200px] text-xs">
+                        <ChevronRight className="mr-1 h-3 w-3 text-muted-foreground" />
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {FASES.map((f) => (
-                          <SelectItem key={f} value={f}>
+                          <SelectItem key={f} value={f} className="text-xs">
                             {faseLabels[f]}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  <TableCell>{g.es_actual ? "Sí" : "No"}</TableCell>
                   <TableCell>
-                    <div className="flex flex-wrap justify-end gap-2">
-                      {!g.es_actual && (
-                        <Button variant="outline" size="sm" onClick={() => activar(g)}>
-                          Activar
+                    <span
+                      className={cn(
+                        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
+                        faseColors[g.estado]
+                      )}
+                    >
+                      {faseLabels[g.estado]}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-end">
+                      {g.es_actual ? (
+                        <span className="text-xs font-medium text-primary">Activa</span>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 hover:bg-primary/10 hover:text-primary hover:border-primary/30"
+                          onClick={() => activar(g)}
+                          disabled={activando === g.id}
+                        >
+                          {activando === g.id ? "Activando..." : "Activar"}
                         </Button>
                       )}
                     </div>
@@ -138,7 +182,7 @@ export function GestionesPage() {
             )}
           </TableBody>
         </Table>
-      </div>
+      </ContentCard>
     </div>
   );
 }

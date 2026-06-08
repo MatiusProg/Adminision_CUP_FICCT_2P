@@ -1,15 +1,19 @@
 // Formulario de postulante. En modo "nuevo" dispara el pago Stripe (no persiste
 // hasta que el pago se complete). En modo "editar" actualiza un postulante existente.
+// Rediseñado: secciones agrupadas con encabezados, campos con id/name,
+// mejor jerarquía visual y feedback de errores más claro.
 
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import { ArrowLeft, CreditCard, Save, User, GraduationCap, MapPin } from "lucide-react";
 import {
   postulanteService,
   type PostulanteFormData,
 } from "@/services/postulanteService";
 import { carrerasService, type Carrera } from "@/services/carrerasService";
 import { ApiError } from "@/lib/apiClient";
+import { PageHeader, ContentCard } from "@/components/ui-shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,8 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
-// Estado inicial vacío del formulario.
 const emptyForm: PostulanteFormData = {
   carrera_1ra_opcion_id: 0,
   carrera_2da_opcion_id: 0,
@@ -39,6 +43,53 @@ const emptyForm: PostulanteFormData = {
   titulo_bachiller: false,
 };
 
+// Sección del formulario con encabezado e ícono.
+function FormSection({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: typeof User;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+        <Icon className="h-4 w-4 text-primary" />
+        {title}
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">{children}</div>
+    </div>
+  );
+}
+
+// Campo de formulario con label, input y error integrados.
+function Field({
+  label,
+  required,
+  error,
+  children,
+  full,
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+  full?: boolean;
+}) {
+  return (
+    <div className={cn("grid gap-1.5", full && "sm:col-span-2")}>
+      <Label className="text-sm font-medium">
+        {label}
+        {required && <span className="ml-1 text-destructive">*</span>}
+      </Label>
+      {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
+  );
+}
+
 export function PostulanteFormPage() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -46,11 +97,9 @@ export function PostulanteFormPage() {
 
   const [form, setForm] = useState<PostulanteFormData>(emptyForm);
   const [carreras, setCarreras] = useState<Carrera[]>([]);
-  // Errores de validación 422 devueltos por Laravel, por campo.
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [submitting, setSubmitting] = useState(false);
 
-  // Carga el catálogo de carreras y, si es edición, los datos del postulante.
   useEffect(() => {
     carrerasService.list().then((res) => setCarreras(res.data)).catch(() => {});
     if (esEdicion && id) {
@@ -75,9 +124,10 @@ export function PostulanteFormPage() {
     }
   }, [esEdicion, id]);
 
-  // Actualiza un campo del formulario de forma genérica.
   function set<K extends keyof PostulanteFormData>(key: K, value: PostulanteFormData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
+    // Limpia el error de ese campo al editar.
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: [] }));
   }
 
   async function handleSubmit() {
@@ -85,12 +135,10 @@ export function PostulanteFormPage() {
     setSubmitting(true);
     try {
       if (esEdicion && id) {
-        // Modo edición: actualiza directamente.
         await postulanteService.update(Number(id), form);
         toast.success("Postulante actualizado correctamente.");
         navigate("/postulantes");
       } else {
-        // Modo nuevo: inicia el pago. Si Stripe devuelve URL, redirigimos allí.
         const res = await postulanteService.iniciarPago(form);
         toast.message("Redirigiendo a la pasarela de pago...");
         window.location.href = res.checkout_url;
@@ -98,7 +146,7 @@ export function PostulanteFormPage() {
     } catch (err) {
       if (err instanceof ApiError && err.status === 422 && err.errors) {
         setErrors(err.errors);
-        toast.error("Revise los campos marcados.");
+        toast.error("Revise los campos marcados en rojo.");
       } else if (err instanceof ApiError) {
         toast.error(err.message);
       } else {
@@ -109,196 +157,233 @@ export function PostulanteFormPage() {
     }
   }
 
-  // Muestra el primer error de un campo, si existe.
-  function fieldError(name: string) {
-    return errors[name]?.[0];
-  }
+  const fe = (name: string) => errors[name]?.[0];
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <h1 className="mb-6 text-2xl font-bold">
-        {esEdicion ? "Editar postulante" : "Registrar postulante"}
-      </h1>
+    <div className="mx-auto max-w-3xl space-y-6">
+      <PageHeader
+        title={esEdicion ? "Editar postulante" : "Registrar postulante"}
+        description={
+          esEdicion
+            ? "Modifique los datos del postulante."
+            : "Complete el formulario. Al continuar, será redirigido a la pasarela de pago."
+        }
+      >
+        <Button variant="ghost" size="sm" onClick={() => navigate("/postulantes")}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Volver
+        </Button>
+      </PageHeader>
 
-      <div className="rounded-3xl bg-card p-8 shadow-card">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          {/* CI */}
-          <div className="grid gap-2">
-            <Label htmlFor="ci">Carnet de Identidad *</Label>
-            <Input id="ci" value={form.ci} onChange={(e) => set("ci", e.target.value)} />
-            {fieldError("ci") && <p className="text-sm text-destructive">{fieldError("ci")}</p>}
-          </div>
+      <ContentCard className="p-6 sm:p-8">
+        <div className="space-y-8">
+          {/* Sección 1: Datos personales */}
+          <FormSection icon={User} title="Datos personales">
+            <Field label="Carnet de Identidad" required error={fe("ci")}>
+              <Input
+                id="ci"
+                name="ci"
+                value={form.ci}
+                onChange={(e) => set("ci", e.target.value)}
+                placeholder="Ej: 1234567"
+                className={fe("ci") ? "border-destructive" : ""}
+              />
+            </Field>
 
-          {/* Fecha de nacimiento */}
-          <div className="grid gap-2">
-            <Label htmlFor="fecha_nacimiento">Fecha de nacimiento *</Label>
-            <Input
-              id="fecha_nacimiento"
-              type="date"
-              value={form.fecha_nacimiento}
-              onChange={(e) => set("fecha_nacimiento", e.target.value)}
-            />
-            {fieldError("fecha_nacimiento") && (
-              <p className="text-sm text-destructive">{fieldError("fecha_nacimiento")}</p>
-            )}
-          </div>
+            <Field label="Fecha de nacimiento" required error={fe("fecha_nacimiento")}>
+              <Input
+                id="fecha_nacimiento"
+                name="fecha_nacimiento"
+                type="date"
+                value={form.fecha_nacimiento}
+                onChange={(e) => set("fecha_nacimiento", e.target.value)}
+                className={fe("fecha_nacimiento") ? "border-destructive" : ""}
+              />
+            </Field>
 
-          {/* Nombres */}
-          <div className="grid gap-2">
-            <Label htmlFor="nombres">Nombres *</Label>
-            <Input id="nombres" value={form.nombres} onChange={(e) => set("nombres", e.target.value)} />
-            {fieldError("nombres") && (
-              <p className="text-sm text-destructive">{fieldError("nombres")}</p>
-            )}
-          </div>
+            <Field label="Nombres" required error={fe("nombres")}>
+              <Input
+                id="nombres"
+                name="nombres"
+                value={form.nombres}
+                onChange={(e) => set("nombres", e.target.value)}
+                placeholder="Ej: Juan Carlos"
+                className={fe("nombres") ? "border-destructive" : ""}
+              />
+            </Field>
 
-          {/* Apellidos */}
-          <div className="grid gap-2">
-            <Label htmlFor="apellidos">Apellidos *</Label>
-            <Input
-              id="apellidos"
-              value={form.apellidos}
-              onChange={(e) => set("apellidos", e.target.value)}
-            />
-            {fieldError("apellidos") && (
-              <p className="text-sm text-destructive">{fieldError("apellidos")}</p>
-            )}
-          </div>
+            <Field label="Apellidos" required error={fe("apellidos")}>
+              <Input
+                id="apellidos"
+                name="apellidos"
+                value={form.apellidos}
+                onChange={(e) => set("apellidos", e.target.value)}
+                placeholder="Ej: Pérez López"
+                className={fe("apellidos") ? "border-destructive" : ""}
+              />
+            </Field>
 
-          {/* Sexo */}
-          <div className="grid gap-2">
-            <Label>Sexo *</Label>
-            <Select value={form.sexo} onValueChange={(v) => set("sexo", v as "M" | "F")}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="M">Masculino</SelectItem>
-                <SelectItem value="F">Femenino</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <Field label="Sexo" required error={fe("sexo")}>
+              <Select value={form.sexo} onValueChange={(v) => set("sexo", v as "M" | "F")}>
+                <SelectTrigger id="sexo" name="sexo">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="M">Masculino</SelectItem>
+                  <SelectItem value="F">Femenino</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
 
-          {/* Email */}
-          <div className="grid gap-2">
-            <Label htmlFor="email">Correo electrónico</Label>
-            <Input
-              id="email"
-              type="email"
-              value={form.email}
-              onChange={(e) => set("email", e.target.value)}
-            />
-            {fieldError("email") && (
-              <p className="text-sm text-destructive">{fieldError("email")}</p>
-            )}
-          </div>
+            <Field label="Correo electrónico" error={fe("email")}>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={(e) => set("email", e.target.value)}
+                placeholder="usuario@correo.com"
+                autoComplete="email"
+                className={fe("email") ? "border-destructive" : ""}
+              />
+            </Field>
 
-          {/* Teléfono */}
-          <div className="grid gap-2">
-            <Label htmlFor="telefono">Teléfono</Label>
-            <Input
-              id="telefono"
-              value={form.telefono}
-              onChange={(e) => set("telefono", e.target.value)}
-            />
-          </div>
+            <Field label="Teléfono">
+              <Input
+                id="telefono"
+                name="telefono"
+                value={form.telefono}
+                onChange={(e) => set("telefono", e.target.value)}
+                placeholder="Ej: 76543210"
+              />
+            </Field>
+          </FormSection>
 
-          {/* Ciudad */}
-          <div className="grid gap-2">
-            <Label htmlFor="ciudad">Ciudad</Label>
-            <Input id="ciudad" value={form.ciudad} onChange={(e) => set("ciudad", e.target.value)} />
-          </div>
+          {/* Sección 2: Procedencia */}
+          <FormSection icon={MapPin} title="Procedencia">
+            <Field label="Ciudad">
+              <Input
+                id="ciudad"
+                name="ciudad"
+                value={form.ciudad}
+                onChange={(e) => set("ciudad", e.target.value)}
+                placeholder="Ej: Santa Cruz de la Sierra"
+              />
+            </Field>
 
-          {/* Colegio */}
-          <div className="grid gap-2">
-            <Label htmlFor="colegio">Colegio de procedencia</Label>
-            <Input
-              id="colegio"
-              value={form.colegio}
-              onChange={(e) => set("colegio", e.target.value)}
-            />
-          </div>
+            <Field label="Colegio de procedencia">
+              <Input
+                id="colegio"
+                name="colegio"
+                value={form.colegio}
+                onChange={(e) => set("colegio", e.target.value)}
+                placeholder="Nombre del colegio"
+              />
+            </Field>
 
-          {/* Dirección */}
-          <div className="grid gap-2">
-            <Label htmlFor="direccion">Dirección</Label>
-            <Input
-              id="direccion"
-              value={form.direccion}
-              onChange={(e) => set("direccion", e.target.value)}
-            />
-          </div>
+            <Field label="Dirección" full>
+              <Input
+                id="direccion"
+                name="direccion"
+                value={form.direccion}
+                onChange={(e) => set("direccion", e.target.value)}
+                placeholder="Dirección de domicilio"
+              />
+            </Field>
+          </FormSection>
 
-          {/* Carrera 1ra opción */}
-          <div className="grid gap-2">
-            <Label>Carrera (1ra opción) *</Label>
-            <Select
-              value={form.carrera_1ra_opcion_id ? String(form.carrera_1ra_opcion_id) : ""}
-              onValueChange={(v) => set("carrera_1ra_opcion_id", Number(v))}
+          {/* Sección 3: Opciones de carrera */}
+          <FormSection icon={GraduationCap} title="Opciones de carrera">
+            <Field
+              label="Carrera (1ra opción)"
+              required
+              error={fe("carrera_1ra_opcion_id")}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccione una carrera" />
-              </SelectTrigger>
-              <SelectContent>
-                {carreras.map((c) => (
-                  <SelectItem key={c.id} value={String(c.id)}>
-                    {c.nombre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {fieldError("carrera_1ra_opcion_id") && (
-              <p className="text-sm text-destructive">{fieldError("carrera_1ra_opcion_id")}</p>
-            )}
-          </div>
+              <Select
+                value={form.carrera_1ra_opcion_id ? String(form.carrera_1ra_opcion_id) : ""}
+                onValueChange={(v) => set("carrera_1ra_opcion_id", Number(v))}
+              >
+                <SelectTrigger id="carrera_1ra" name="carrera_1ra_opcion_id"
+                  className={fe("carrera_1ra_opcion_id") ? "border-destructive" : ""}
+                >
+                  <SelectValue placeholder="Seleccione una carrera" />
+                </SelectTrigger>
+                <SelectContent>
+                  {carreras.map((c) => (
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {c.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
 
-          {/* Carrera 2da opción */}
-          <div className="grid gap-2">
-            <Label>Carrera (2da opción) *</Label>
-            <Select
-              value={form.carrera_2da_opcion_id ? String(form.carrera_2da_opcion_id) : ""}
-              onValueChange={(v) => set("carrera_2da_opcion_id", Number(v))}
+            <Field
+              label="Carrera (2da opción)"
+              required
+              error={fe("carrera_2da_opcion_id")}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccione una carrera" />
-              </SelectTrigger>
-              <SelectContent>
-                {carreras.map((c) => (
-                  <SelectItem key={c.id} value={String(c.id)}>
-                    {c.nombre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {fieldError("carrera_2da_opcion_id") && (
-              <p className="text-sm text-destructive">{fieldError("carrera_2da_opcion_id")}</p>
-            )}
+              <Select
+                value={form.carrera_2da_opcion_id ? String(form.carrera_2da_opcion_id) : ""}
+                onValueChange={(v) => set("carrera_2da_opcion_id", Number(v))}
+              >
+                <SelectTrigger id="carrera_2da" name="carrera_2da_opcion_id"
+                  className={fe("carrera_2da_opcion_id") ? "border-destructive" : ""}
+                >
+                  <SelectValue placeholder="Seleccione una carrera" />
+                </SelectTrigger>
+                <SelectContent>
+                  {carreras.map((c) => (
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {c.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          </FormSection>
+
+          {/* Título de bachiller */}
+          <div className="flex items-start gap-3 rounded-lg border bg-muted/30 p-4">
+            <Checkbox
+              id="titulo_bachiller"
+              checked={form.titulo_bachiller}
+              onCheckedChange={(v) => set("titulo_bachiller", Boolean(v))}
+              className="mt-0.5"
+            />
+            <div>
+              <Label htmlFor="titulo_bachiller" className="cursor-pointer font-medium">
+                Cuenta con título de bachiller
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Marque si el postulante tiene título de bachillerato.
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Título de bachiller (solo booleano; no se sube archivo) */}
-        <div className="mt-6 flex items-center gap-2">
-          <Checkbox
-            id="titulo_bachiller"
-            checked={form.titulo_bachiller}
-            onCheckedChange={(v) => set("titulo_bachiller", Boolean(v))}
-          />
-          <Label htmlFor="titulo_bachiller">Cuenta con título de bachiller</Label>
-        </div>
-
-        <div className="mt-8 flex flex-wrap justify-end gap-3">
+        {/* Acciones */}
+        <div className="mt-8 flex flex-wrap justify-end gap-3 border-t pt-6">
           <Button variant="outline" onClick={() => navigate("/postulantes")}>
             Cancelar
           </Button>
-          <Button onClick={handleSubmit} disabled={submitting}>
-            {submitting
-              ? "Procesando..."
-              : esEdicion
-                ? "Guardar cambios"
-                : "Continuar al pago"}
+          <Button onClick={handleSubmit} disabled={submitting} className="min-w-[160px]">
+            {submitting ? (
+              "Procesando..."
+            ) : esEdicion ? (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Guardar cambios
+              </>
+            ) : (
+              <>
+                <CreditCard className="mr-2 h-4 w-4" />
+                Continuar al pago
+              </>
+            )}
           </Button>
         </div>
-      </div>
+      </ContentCard>
     </div>
   );
 }
