@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'rol',
+        'activo',
     ];
 
     protected $hidden = [
@@ -32,6 +33,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'activo' => 'boolean',
     ];
 
     /**
@@ -40,5 +42,17 @@ class User extends Authenticatable
     public function postulante(): HasOne
     {
         return $this->hasOne(Postulante::class);
+    }
+
+    /** Perfil de docente asociado a este usuario (si tiene rol docente). */
+    public function docente(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Docente::class);
+    }
+
+    /** Solo usuarios activos (no desactivados). */
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
     }
 }

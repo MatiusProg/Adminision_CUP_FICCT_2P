@@ -62,4 +62,22 @@ class Gestion extends Model
     {
         return static::where('es_actual', true)->first();
     }
+
+    /** Grupos generados para esta gestión. */
+    public function grupos(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Grupo::class);
+    }
+
+    /** Exámenes de esta gestión (12 en total: 3 por cada materia). */
+    public function examenes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Examen::class);
+    }
+
+    /** Resultados de asignación de cupos de esta gestión. */
+    public function cuposAsignados(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CupoAsignado::class);
+    }
 }

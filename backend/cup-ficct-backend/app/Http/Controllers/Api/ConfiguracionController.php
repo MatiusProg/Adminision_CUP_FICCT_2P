@@ -34,6 +34,14 @@ class ConfiguracionController extends Controller
      */
     public function update(Request $request, string $clave): JsonResponse
     {
+        // Claves de solo lectura: los pesos son fijos y no se pueden cambiar desde la UI.
+        $clavesProtegidas = ['peso_examen_1', 'peso_examen_2', 'peso_examen_3'];
+        if (in_array($clave, $clavesProtegidas)) {
+            return response()->json([
+                'message' => 'Este parámetro es de solo lectura y no puede modificarse.'
+            ], 403);
+        }
+        
         $data = $request->validate([
             'valor' => ['required', 'string', 'max:255'],
         ], [

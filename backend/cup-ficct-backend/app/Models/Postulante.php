@@ -65,4 +65,22 @@ class Postulante extends Model
     {
         return $this->hasMany(Pago::class);
     }
+
+    /** Inscripciones a grupos de este postulante. */
+    public function inscripciones(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Inscripcion::class);
+    }
+
+    /** Notas de este postulante en todos los exámenes. */
+    public function notas(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Nota::class);
+    }
+
+    /** Resultado de asignación de cupo de este postulante. */
+    public function cupoAsignado(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(CupoAsignado::class);
+    }
 }
