@@ -53,6 +53,6 @@ class User extends Authenticatable
     /** Solo usuarios activos (no desactivados). */
     public function scopeActivos($query)
     {
-        return $query->where('activo', true);
+        return $query->whereRaw('"activo" = TRUE');
     }
 }

@@ -49,6 +49,6 @@ class Docente extends Model
     /** Solo docentes activos. */
     public function scopeActivos($query)
     {
-        return $query->where('activo', true);
+        return $query->whereRaw('"activo" = TRUE');
     }
 }

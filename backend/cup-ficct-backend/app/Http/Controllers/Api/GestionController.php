@@ -115,9 +115,12 @@ class GestionController extends Controller
     {
         DB::transaction(function () use ($gestion) {
             // Desactivar la gestión actualmente marcada.
-            Gestion::where('es_actual', true)->update(['es_actual' => false]);
+            // Usamos whereRaw + DB::raw para evitar el problema boolean=integer
+            // con PDO::ATTR_EMULATE_PREPARES en el pooler de Supabase.
+            Gestion::whereRaw('"es_actual" = TRUE')
+                ->update(['es_actual' => DB::raw('FALSE')]);
             // Activar la solicitada.
-            $gestion->update(['es_actual' => true]);
+            $gestion->update(['es_actual' => DB::raw('TRUE')]);
         });
 
         $this->audit->log('activar', 'Gestion', $gestion->id, null, $request);

@@ -171,7 +171,7 @@ class PagoStripeService
                     'email'                 => $datos['email'] ?? null,
                     'colegio'               => $datos['colegio'] ?? null,
                     'ciudad'                => $datos['ciudad'] ?? null,
-                    'titulo_bachiller'      => (bool) ($datos['titulo_bachiller'] ?? false),
+                    'titulo_bachiller' => $datos['titulo_bachiller'] ? DB::raw('TRUE') : DB::raw('FALSE'),
                     'estado'                => 'confirmado',
                 ]);
 
