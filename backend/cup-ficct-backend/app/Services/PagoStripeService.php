@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Stripe\Checkout\Session as StripeSession;
 use Stripe\Stripe;
 use Stripe\Webhook;
@@ -152,7 +151,7 @@ class PagoStripeService
                 $user = User::create([
                     'name'     => trim(($datos['nombres'] ?? '') . ' ' . ($datos['apellidos'] ?? '')),
                     'email'    => $datos['email'] ?? ($datos['ci'] . '@cup.local'),
-                    'password' => Hash::make(Str::random(16)),
+                    'password' => Hash::make($datos['ci']),
                     'rol'      => 'postulante',
                 ]);
 
