@@ -13,13 +13,13 @@ import { portalService, type NotaMateria, type InfoPostulante, type InfoGestion 
 /** Nota aprobada si promedio >= 60 (nota_minima_aprobacion). */
 function estaAprobada(promedio: number | null): boolean | null {
   if (promedio === null) return null;
-  return promedio >= 60;
+  return Number(promedio) >= 60;
 }
 
 /** Formatea calificación con 2 decimales o muestra guión si es nula. */
-function formatNota(valor: number | null): string {
+function formatNota(valor: number | string | null): string {
   if (valor === null) return "—";
-  return valor.toFixed(2);
+  return Number(valor).toFixed(2);
 }
 
 // ── Tarjeta de notas por materia ─────────────────────────────────────────────
@@ -89,7 +89,7 @@ function NotaMateriaCard({ item }: { item: NotaMateria }) {
                     "font-heading text-xl font-bold",
                     val === null
                       ? "text-muted-foreground/40"
-                      : val >= 60
+                      : Number(val) >= 60
                       ? "text-emerald-600 dark:text-emerald-400"
                       : "text-destructive"
                   )}
@@ -114,7 +114,7 @@ function NotaMateriaCard({ item }: { item: NotaMateria }) {
                 : "text-muted-foreground"
             )}
           >
-            {item.promedio !== null ? item.promedio.toFixed(2) : "—"}
+            {item.promedio !== null ? Number(item.promedio).toFixed(2) : "—"}
           </span>
         </div>
 
