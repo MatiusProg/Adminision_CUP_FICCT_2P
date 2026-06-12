@@ -3,7 +3,7 @@
 // Si la gestión no está en fase en_curso o finalizada, muestra mensaje.
 
 import { useEffect, useState } from "react";
-import { ClipboardList, AlertCircle, Loader2, TrendingUp, CheckCircle2, XCircle } from "lucide-react";
+import { AlertCircle, Loader2, TrendingUp, CheckCircle2, XCircle } from "lucide-react";
 import { PageHeader, ContentCard, EstadoBadge } from "@/components/ui-shared";
 import { cn } from "@/lib/utils";
 import { portalService, type NotaMateria, type InfoPostulante, type InfoGestion } from "@/services/portalService";

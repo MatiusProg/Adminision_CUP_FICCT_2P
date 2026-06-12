@@ -3,7 +3,7 @@
 // Si la gestión no está en fase suficiente, muestra un mensaje de estado.
 
 import { useEffect, useState } from "react";
-import { BookOpen, MapPin, Clock, UserCircle, GraduationCap, AlertCircle, Loader2 } from "lucide-react";
+import { BookOpen, MapPin, Clock, UserCircle, AlertCircle, Loader2 } from "lucide-react";
 import { PageHeader, ContentCard } from "@/components/ui-shared";
 import { EstadoBadge } from "@/components/ui-shared";
 import { portalService, type MateriaPortal, type InfoPostulante, type InfoGestion } from "@/services/portalService";
