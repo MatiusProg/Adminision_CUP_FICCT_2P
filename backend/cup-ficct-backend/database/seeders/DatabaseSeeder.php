@@ -42,6 +42,7 @@ class DatabaseSeeder extends Seeder
             GestionesHistoricasSeeder::class,
             ExamenesSeeder::class,
             CargaMasivaSeeder::class,
+            PagosMasivoSeeder::class,
         ]);
     }
 }
