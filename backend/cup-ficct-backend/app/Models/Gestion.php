@@ -60,7 +60,7 @@ class Gestion extends Model
      */
     public static function actual(): ?self
     {
-        return static::where('es_actual', true)->first();
+        return static::whereRaw('"es_actual" = TRUE')->first();
     }
 
     /** Grupos generados para esta gestión. */
