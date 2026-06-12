@@ -20,6 +20,8 @@ import { CarrerasPage } from "@/pages/Admin/CarrerasPage";
 import { ConfiguracionPage } from "@/pages/Admin/ConfiguracionPage";
 import { GestionesPage } from "@/pages/Admin/GestionesPage";
 import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
+import { MisMateriasPage } from "@/pages/Postulantes/MisMateriasPage";
+import { MisNotasPage } from "@/pages/Postulantes/MisNotasPage";
 
 // ── Redirección según rol ─────────────────────────────────────────────────────
 function HomeRedirect() {
@@ -139,10 +141,7 @@ export default function App() {
                   path="/mis-materias"
                   element={
                     <ProtectedRoute roles={["postulante"]}>
-                      <PlaceholderPage
-                        title="Mis materias"
-                        description="Aquí verás tu grupo, aula, horario y docente por materia. Disponible cuando se generen los grupos."
-                      />
+                      <MisMateriasPage />
                     </ProtectedRoute>
                   }
                 />
@@ -150,10 +149,7 @@ export default function App() {
                   path="/mis-notas"
                   element={
                     <ProtectedRoute roles={["postulante"]}>
-                      <PlaceholderPage
-                        title="Mis notas"
-                        description="Aquí verás tus calificaciones y promedios por materia. Disponible cuando se publiquen las notas."
-                      />
+                      <MisNotasPage />
                     </ProtectedRoute>
                   }
                 />

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\GestionController;
 use App\Http\Controllers\Api\PagoController;
 use App\Http\Controllers\Api\PostulanteController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\PostulantePortalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,5 +75,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Dashboard — admin y autoridad
     Route::middleware('role:admin,autoridad')->group(function () {
         Route::get('/dashboard/kpis', [DashboardController::class, 'kpis']);
+    });
+    
+    // Portal del postulante (UC-23) — solo el propio postulante accede
+    Route::middleware('role:postulante')->group(function () {
+        Route::get('/postulante/mis-materias', [PostulantePortalController::class, 'misMaterias']);
+        Route::get('/postulante/mis-notas',    [PostulantePortalController::class, 'misNotas']);
     });
 });
