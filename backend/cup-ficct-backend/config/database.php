@@ -97,6 +97,12 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Requerido para Octane + Supabase pooler (puerto 6543).
+            // El pooler descarta prepared statements entre conexiones;
+            // emularlos en PDO evita el error "prepared statement does not exist".
+            'options' => [
+                PDO::ATTR_EMULATE_PREPARES => true,
+            ],
         ],
 
         'sqlsrv' => [
