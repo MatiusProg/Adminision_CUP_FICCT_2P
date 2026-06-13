@@ -151,7 +151,7 @@ function UsuarioModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+    <Dialog open={open} onOpenChange={(v:boolean) => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-heading">
@@ -280,8 +280,8 @@ export function UsuariosPage() {
     const ok = await confirm({
       title: `${verbo} usuario`,
       description: `¿Está seguro de ${accion} a ${u.name}?${u.activo ? " Perderá acceso al sistema." : ""}`,
-      confirmLabel: verbo,
-      variant: u.activo ? "destructive" : "default",
+      confirmText: verbo,
+      destructive: u.activo
     });
     if (!ok) return;
 

@@ -151,7 +151,7 @@ function DocenteModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+    <Dialog open={open} onOpenChange={(v: boolean) => !v && onClose()}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-heading">
@@ -255,7 +255,7 @@ function DocenteModal({
             <Checkbox
               id="d-diplomado"
               checked={form.diplomado_docencia}
-              onCheckedChange={(v) => set("diplomado_docencia", Boolean(v))}
+              onCheckedChange={(v: boolean | "indeterminate") => set("diplomado_docencia", Boolean(v))}
             />
             <Label htmlFor="d-diplomado" className="cursor-pointer">
               Tiene diplomado en docencia universitaria
@@ -269,7 +269,7 @@ function DocenteModal({
                 <Checkbox
                   id="d-crear-cuenta"
                   checked={form.crear_cuenta}
-                  onCheckedChange={(v) => set("crear_cuenta", Boolean(v))}
+                  onCheckedChange={(v: boolean | "indeterminate") => set("diplomado_docencia", Boolean(v))}
                 />
                 <Label htmlFor="d-crear-cuenta" className="cursor-pointer font-medium">
                   Crear cuenta de acceso al sistema
@@ -344,8 +344,8 @@ export function DocentesPage() {
     const ok = await confirm({
       title: `${verbo} docente`,
       description: `¿Está seguro de ${accion} a ${nombre}?${d.activo && d.user_id ? " También se desactivará su cuenta de acceso al sistema." : ""}`,
-      confirmLabel: verbo,
-      variant: d.activo ? "destructive" : "default",
+      confirmText: verbo,
+      destructive: d.activo,
     });
     if (!ok) return;
 
