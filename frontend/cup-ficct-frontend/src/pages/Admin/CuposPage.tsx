@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  Award, GraduationCap, Zap, Loader2, AlertCircle,
+  Award, GraduationCap, Zap, Loader2,
   CheckCircle2, XCircle, ChevronLeft, ChevronRight, Trophy,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -129,7 +129,7 @@ export function CuposPage() {
   const [loading, setLoading] = useState(true);
   const [asignando, setAsignando] = useState(false);
   const [resultado, setResultado] = useState<ResultadoAsignacion | null>(null);
-  const [filtroCarrera, setFiltroCarrera] = useState("todos");
+  const [filtroCarrera] = useState("todos");
   const [filtroOpcion, setFiltroOpcion] = useState("todos");
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
