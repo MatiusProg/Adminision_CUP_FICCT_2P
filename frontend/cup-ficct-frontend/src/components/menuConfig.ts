@@ -132,7 +132,6 @@ export const menuPackages: MenuPackage[] = [
         path: "/docentes",
         icon: GraduationCap,
         roles: ["admin"],
-        placeholder: true,
         // UC-11: CRUD de docentes con cuenta de usuario opcional
       },
       {
