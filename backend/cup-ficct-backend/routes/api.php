@@ -117,9 +117,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // UC-14/15: Gestión de grupos — admin y coordinador
     Route::middleware('role:admin,coordinador_academico')->group(function () {
-        Route::get('/grupos',                          [GrupoController::class, 'index']);
-        Route::get('/grupos/horarios',                 [GrupoController::class, 'horarios']);
-        Route::post('/grupos/generar',                 [GrupoController::class, 'generar']);
-        Route::put('/grupos/{grupo}/horario',          [GrupoController::class, 'actualizarHorario']);
+        // UC-14: generación y edición de grupos
+        Route::get('/grupos',                                [GrupoController::class, 'index']);
+        Route::get('/grupos/horarios',                       [GrupoController::class, 'horarios']);
+        Route::post('/grupos/generar',                       [GrupoController::class, 'generar']);
+        Route::put('/grupos/{grupo}/horario',                [GrupoController::class, 'actualizarHorario']);
+    
+        // UC-15: asignación de docentes con validaciones
+        Route::get('/grupos/{grupo}/docentes-disponibles',   [GrupoController::class, 'docentesDisponibles']);
+        Route::put('/grupos/{grupo}/asignar-docente',        [GrupoController::class, 'asignarDocente']);
+        Route::delete('/grupos/{grupo}/docente',             [GrupoController::class, 'desasignarDocente']);
     });
 });

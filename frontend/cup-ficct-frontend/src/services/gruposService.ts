@@ -2,51 +2,32 @@
 
 import { apiClient } from "@/lib/apiClient";
 
-// ── Tipos ─────────────────────────────────────────────────────────────────────
-
 export interface DocenteGrupo {
-  id: number;
-  nombres: string;
-  apellidos: string;
-  titulo: string | null;
+  id: number; nombres: string; apellidos: string; titulo: string | null;
+}
+
+export interface DocenteDisponible {
+  id: number; nombres: string; apellidos: string; titulo: string | null;
+  grado_academico: string; grupos_asignados: number; grupos_disponibles: number;
 }
 
 export interface Grupo {
-  id: number;
-  nombre: string;
-  aula: string | null;
-  horario: string | null;
-  capacidad: number;
-  inscritos: number;
-  materia: {
-    id: number;
-    nombre: string;
-    codigo: string;
-  };
+  id: number; nombre: string; aula: string | null; horario: string | null;
+  capacidad: number; inscritos: number;
+  materia: { id: number; nombre: string; codigo: string };
   docente: DocenteGrupo | null;
 }
 
 export interface GruposPorMateria {
-  materia_id: number;
-  materia_nombre: string;
-  materia_codigo: string;
-  grupos: Grupo[];
+  materia_id: number; materia_nombre: string; materia_codigo: string; grupos: Grupo[];
 }
 
 export interface ResultadoGeneracion {
-  total_postulantes: number;
-  num_grupos: number;
-  total_grupos: number;
-  max_alumnos_grupo: number;
-  total_inscripciones: number;
-  total_examenes: number;
-  materias: number;
+  total_postulantes: number; num_grupos: number; total_grupos: number;
+  max_alumnos_grupo: number; total_inscripciones: number; total_examenes: number; materias: number;
 }
 
-export interface HorarioOpcion {
-  codigo: string;
-  label: string;
-}
+export interface HorarioOpcion { codigo: string; label: string; }
 
 export interface GruposResponse {
   data: GruposPorMateria[];
@@ -54,35 +35,36 @@ export interface GruposResponse {
   total_grupos: number;
 }
 
-// ── Servicio ──────────────────────────────────────────────────────────────────
+export interface DocentesDisponiblesResponse {
+  data: DocenteDisponible[];
+  grupo: { id: number; nombre: string; horario: string | null };
+  materia: { codigo: string; nombre: string };
+  requisito: string;
+}
 
 export const gruposService = {
-  /**
-   * Lista grupos de la gestión activa agrupados por materia.
-   */
   list() {
     return apiClient.get<GruposResponse>("/grupos");
   },
-
-  /**
-   * Ejecuta el algoritmo CEIL para generar grupos automáticamente.
-   * Requiere que la gestión esté en fase 'cup_iniciado'.
-   */
   generar() {
     return apiClient.post<{ message: string; data: ResultadoGeneracion }>("/grupos/generar");
   },
-
-  /**
-   * Actualiza el aula y/o horario de un grupo específico.
-   */
   actualizarHorario(id: number, data: { aula?: string; horario?: string }) {
     return apiClient.put<{ message: string; data: Grupo }>(`/grupos/${id}/horario`, data);
   },
-
-  /**
-   * Obtiene la lista de horarios disponibles (para el select de la UI).
-   */
   horarios() {
     return apiClient.get<{ data: HorarioOpcion[] }>("/grupos/horarios");
+  },
+  // UC-15: docentes disponibles para un grupo (con validaciones aplicadas en servidor)
+  docentesDisponibles(grupoId: number) {
+    return apiClient.get<DocentesDisponiblesResponse>(`/grupos/${grupoId}/docentes-disponibles`);
+  },
+  // UC-15: asignar docente a grupo
+  asignarDocente(grupoId: number, docenteId: number) {
+    return apiClient.put<{ message: string; data: Grupo }>(`/grupos/${grupoId}/asignar-docente`, { docente_id: docenteId });
+  },
+  // UC-15: desasignar docente de grupo
+  desasignarDocente(grupoId: number) {
+    return apiClient.delete<{ message: string }>(`/grupos/${grupoId}/docente`);
   },
 };
