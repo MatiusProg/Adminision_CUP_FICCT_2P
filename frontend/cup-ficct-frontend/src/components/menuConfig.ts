@@ -139,7 +139,6 @@ export const menuPackages: MenuPackage[] = [
         path: "/grupos",
         icon: Group,
         roles: ["admin"],
-        placeholder: true,
         // UC-14/15: generación automática y asignación de docentes a grupos
       },
       {

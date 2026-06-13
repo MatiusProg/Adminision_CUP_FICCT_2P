@@ -16,6 +16,8 @@ use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\UserController;
 //CU-11 - KAREN
 use App\Http\Controllers\Api\DocenteController;
+//CU-14/15 - MATEO
+use App\Http\Controllers\Api\GrupoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,5 +113,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/docentes/{docente}',               [DocenteController::class, 'update']);
         Route::put('/docentes/{docente}/desactivar',    [DocenteController::class, 'desactivar']);
         Route::put('/docentes/{docente}/reactivar',     [DocenteController::class, 'reactivar']);
+    });
+
+    // UC-14/15: Gestión de grupos — admin y coordinador
+    Route::middleware('role:admin,coordinador_academico')->group(function () {
+        Route::get('/grupos',                          [GrupoController::class, 'index']);
+        Route::get('/grupos/horarios',                 [GrupoController::class, 'horarios']);
+        Route::post('/grupos/generar',                 [GrupoController::class, 'generar']);
+        Route::put('/grupos/{grupo}/horario',          [GrupoController::class, 'actualizarHorario']);
     });
 });

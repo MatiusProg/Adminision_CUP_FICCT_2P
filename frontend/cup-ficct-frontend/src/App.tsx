@@ -31,6 +31,8 @@ import { ResetPasswordPage } from "@/pages/Auth/ResetPasswordPage";
 import { UsuariosPage } from "@/pages/Admin/UsuariosPage";
 // CU-11 Gestión de docentes
 import { DocentesPage } from "@/pages/Admin/DocentesPage";
+// CU14/15 Gestión de grupos y asignación de docentes a grupos
+import { GruposPage } from "@/pages/Admin/GruposPage";
 
 // ── Redirección según rol ─────────────────────────────────────────────────────
 function HomeRedirect() {
@@ -204,12 +206,12 @@ export default function App() {
                   }
                 />
                 <Route
-                  path="/grupos"
-                  element={
-                    <ProtectedRoute roles={["admin"]}>
-                      <PlaceholderPage title="Grupos" />
-                    </ProtectedRoute>
-                  }
+                   path="/grupos"
+                   element={
+                     <ProtectedRoute roles={["admin"]}>
+                       <GruposPage />
+                     </ProtectedRoute>
+                   }
                 />
                 <Route
                   path="/cupos"
