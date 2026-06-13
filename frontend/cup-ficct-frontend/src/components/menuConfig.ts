@@ -106,8 +106,7 @@ export const menuPackages: MenuPackage[] = [
         path: "/notas",
         icon: ClipboardList,
         roles: ["admin", "coordinador_academico"],
-        placeholder: true,
-        // UC-12: carga individual o por lote de las 3 notas por materia
+        // UC-12/13: registro de notas y cálculo de promedios
       },
       {
         label: "Calcular promedios",

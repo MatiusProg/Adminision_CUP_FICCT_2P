@@ -35,6 +35,8 @@ import { DocentesPage } from "@/pages/Admin/DocentesPage";
 import { GruposPage } from "@/pages/Admin/GruposPage";
 // CU16 Asignación de cupos por carrera (admin)
 import { CuposPage } from "@/pages/Admin/CuposPage";
+// CU12/13 Registro de notas y cálculo de promedios
+import { NotasPage } from "@/pages/Admin/NotasPage";
 
 // ── Redirección según rol ─────────────────────────────────────────────────────
 function HomeRedirect() {
@@ -184,7 +186,7 @@ export default function App() {
                   path="/notas"
                   element={
                     <ProtectedRoute roles={["admin", "coordinador_academico"]}>
-                      <PlaceholderPage title="Registro de notas" />
+                      <NotasPage />
                     </ProtectedRoute>
                   }
                 />
@@ -192,7 +194,7 @@ export default function App() {
                   path="/notas/calcular"
                   element={
                     <ProtectedRoute roles={["admin", "coordinador_academico"]}>
-                      <PlaceholderPage title="Calcular promedios" />
+                      <NotasPage />
                     </ProtectedRoute>
                   }
                 />
