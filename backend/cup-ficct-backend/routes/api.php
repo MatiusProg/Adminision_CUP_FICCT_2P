@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\DocenteController;
 //CU-14/15 - MATEO
 use App\Http\Controllers\Api\GrupoController;
+//CU-12/13 - KAREN
+use App\Http\Controllers\Api\NotaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -127,5 +129,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/grupos/{grupo}/docentes-disponibles',   [GrupoController::class, 'docentesDisponibles']);
         Route::put('/grupos/{grupo}/asignar-docente',        [GrupoController::class, 'asignarDocente']);
         Route::delete('/grupos/{grupo}/docente',             [GrupoController::class, 'desasignarDocente']);
+    });
+
+    // UC-12/13: Registro y cálculo de notas
+    Route::middleware('role:admin,coordinador_academico')->group(function () {
+        Route::get('/notas/materia/{materia}',          [NotaController::class, 'porMateria']);
+        Route::get('/notas/postulante/{postulante}',    [NotaController::class, 'porPostulante']);
+        Route::post('/notas/registrar',                 [NotaController::class, 'registrar']);
+        Route::post('/notas/registrar-lote',            [NotaController::class, 'registrarLote']);
+        Route::post('/notas/calcular/{postulante}',     [NotaController::class, 'calcularPostulante']);
+        Route::post('/notas/calcular-todos',            [NotaController::class, 'calcularTodos']);
     });
 });
