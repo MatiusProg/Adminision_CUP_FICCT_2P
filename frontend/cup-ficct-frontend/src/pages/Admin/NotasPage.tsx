@@ -2,10 +2,10 @@
 // Vista A: tabla por materia (registro masivo por examen).
 // Vista B: búsqueda por postulante (ver/editar notas de un alumno específico).
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState} from "react";
 import {
   BookOpen, Search, Calculator, CheckCircle2, XCircle,
-  Loader2, AlertCircle, ChevronDown, Save, RefreshCw,
+  Loader2, AlertCircle, Save, RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/context/useConfirm";
@@ -282,7 +282,6 @@ function VistaPorMateria() {
 // ── Vista B: búsqueda por postulante ─────────────────────────────────────────
 function VistaPorPostulante() {
   const [busqueda, setBusqueda] = useState("");
-  const [postulanteId, setPostulanteId] = useState<number | null>(null);
   const [datos, setDatos] = useState<NotasPorPostulanteResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [calculando, setCalculando] = useState(false);
@@ -313,7 +312,6 @@ function VistaPorPostulante() {
 
       // Tomar el primero y cargar sus notas.
       const p = postulantes[0];
-      setPostulanteId(p.id);
       const resNotas = await notasService.porPostulante(p.id);
       setDatos(resNotas);
     } catch {
