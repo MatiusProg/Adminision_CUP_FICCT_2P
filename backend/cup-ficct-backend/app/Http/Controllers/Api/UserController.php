@@ -139,14 +139,12 @@ class UserController extends Controller
     {
         abort_if(! in_array($user->rol, self::ROLES_INTERNOS), 404);
 
-        // No se puede desactivar a sí mismo.
         if ($request->user()->id === $user->id) {
             return response()->json([
                 'message' => 'No puede desactivar su propia cuenta.',
             ], 422);
         }
 
-        // Proteger al último administrador activo.
         if ($user->rol === 'admin') {
             $adminsActivos = User::where('rol', 'admin')
                 ->whereRaw('"activo" = TRUE')
@@ -159,9 +157,10 @@ class UserController extends Controller
             }
         }
 
-        $user->update(['activo' => DB::raw('FALSE')]);
+        // Usar DB::table para evitar el problema boolean con PDO::ATTR_EMULATE_PREPARES.
+        DB::table('users')->where('id', $user->id)
+            ->update(['activo' => DB::raw('FALSE')]);
 
-        // Invalidar todos los tokens del usuario desactivado.
         $user->tokens()->delete();
 
         $this->audit->log('desactivar', 'User', $user->id, [
@@ -177,16 +176,17 @@ class UserController extends Controller
      * Ruta: PUT /api/usuarios/{user}/reactivar
      */
     public function reactivar(Request $request, User $user): JsonResponse
-    {
-        abort_if(! in_array($user->rol, self::ROLES_INTERNOS), 404);
+{
+    abort_if(! in_array($user->rol, self::ROLES_INTERNOS), 404);
 
-        $user->update(['activo' => DB::raw('TRUE')]);
+    DB::table('users')->where('id', $user->id)
+        ->update(['activo' => DB::raw('TRUE')]);
 
-        $this->audit->log('reactivar', 'User', $user->id, [
-            'name' => $user->name,
-            'rol'  => $user->rol,
-        ], $request);
+    $this->audit->log('reactivar', 'User', $user->id, [
+        'name' => $user->name,
+        'rol'  => $user->rol,
+    ], $request);
 
-        return response()->json(['message' => "Usuario {$user->name} reactivado correctamente."]);
-    }
+    return response()->json(['message' => "Usuario {$user->name} reactivado correctamente."]);
+}
 }

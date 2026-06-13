@@ -175,14 +175,14 @@ class DocenteController extends Controller
     public function desactivar(Request $request, Docente $docente): JsonResponse
     {
         DB::transaction(function () use ($docente, $request) {
-            // Desactivar cuenta de usuario asociada si existe.
             if ($docente->user_id) {
-                $docente->user->update(['activo' => DB::raw('FALSE')]);
-                // Invalidar tokens del usuario desactivado.
+                DB::table('users')->where('id', $docente->user_id)
+                    ->update(['activo' => DB::raw('FALSE')]);
                 $docente->user->tokens()->delete();
             }
 
-            $docente->update(['activo' => DB::raw('FALSE')]);
+            DB::table('docentes')->where('id', $docente->id)
+                ->update(['activo' => DB::raw('FALSE')]);
 
             $this->audit->log('desactivar', 'Docente', $docente->id, [
                 'nombre' => trim($docente->nombres . ' ' . $docente->apellidos),
@@ -202,10 +202,12 @@ class DocenteController extends Controller
     {
         DB::transaction(function () use ($docente, $request) {
             if ($docente->user_id) {
-                $docente->user->update(['activo' => DB::raw('TRUE')]);
+                DB::table('users')->where('id', $docente->user_id)
+                    ->update(['activo' => DB::raw('TRUE')]);
             }
 
-            $docente->update(['activo' => DB::raw('TRUE')]);
+            DB::table('docentes')->where('id', $docente->id)
+                ->update(['activo' => DB::raw('TRUE')]);
 
             $this->audit->log('reactivar', 'Docente', $docente->id, [
                 'nombre' => trim($docente->nombres . ' ' . $docente->apellidos),
