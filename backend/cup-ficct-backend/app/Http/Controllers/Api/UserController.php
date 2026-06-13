@@ -90,7 +90,7 @@ class UserController extends Controller
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
             'rol'      => $data['rol'],
-            'activo'   => true,
+            'activo'   => DB::raw('TRUE'),
         ]);
 
         $this->audit->log('crear', 'User', $user->id, [

@@ -94,12 +94,11 @@ class DocenteController extends Controller
                     'email'    => $data['email'],
                     'password' => Hash::make($data['password']),
                     'rol'      => 'docente',
-                    'activo'   => true,
+                    'activo'   => DB::raw('TRUE'),
                 ]);
                 $userId = $user->id;
             }
 
-            // Crear el docente vinculado al usuario (si se creó).
             $docente = Docente::create([
                 'ci'                  => $data['ci'],
                 'nombres'             => $data['nombres'],
@@ -108,9 +107,11 @@ class DocenteController extends Controller
                 'telefono'            => $data['telefono'] ?? null,
                 'titulo'              => $data['titulo'] ?? null,
                 'grado_academico'     => $data['grado_academico'],
-                'diplomado_docencia'  => $data['diplomado_docencia'] ?? false,
+                // DB::raw para evitar boolean=integer con PDO::ATTR_EMULATE_PREPARES.
+                'diplomado_docencia'  => ($data['diplomado_docencia'] ?? false)
+                                            ? DB::raw('TRUE') : DB::raw('FALSE'),
                 'user_id'             => $userId,
-                'activo'              => true,
+                'activo'              => DB::raw('TRUE'),
             ]);
 
             $this->audit->log('crear', 'Docente', $docente->id, [
