@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\CupoController;
 use App\Http\Controllers\Api\NotaController;
 //CU-17 - MATEO
 use App\Http\Controllers\Api\MisGruposController;
+use App\Http\Controllers\Api\ImportNotasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -157,4 +158,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/docente/mis-grupos',          [MisGruposController::class, 'index']);
         Route::get('/docente/mis-grupos/{grupo}',  [MisGruposController::class, 'show']);
     });
+
+    // Carga masiva de notas por Excel/CSV
+    Route::get('/notas/plantilla/{materia}',  [ImportNotasController::class, 'descargarPlantilla']);
+    Route::post('/notas/importar',            [ImportNotasController::class, 'importar']);
 });
