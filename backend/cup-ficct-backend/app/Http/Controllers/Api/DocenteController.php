@@ -58,7 +58,8 @@ class DocenteController extends Controller
             $query->whereRaw($activo ? '"activo" = TRUE' : '"activo" = FALSE');
         }
 
-        $docentes = $query->orderBy('apellidos')->paginate(15);
+        $perPage  = (int) $request->query('per_page', 15);
+        $docentes = $query->orderBy('apellidos')->paginate($perPage);
 
         return DocenteResource::collection($docentes)->response();
     }
@@ -138,20 +139,33 @@ class DocenteController extends Controller
         $antes = $docente->toArray();
 
         DB::transaction(function () use ($data, $docente, $request, $antes) {
-            $docente->update([
-                'ci'                 => $data['ci']                 ?? $docente->ci,
-                'nombres'            => $data['nombres']            ?? $docente->nombres,
-                'apellidos'          => $data['apellidos']          ?? $docente->apellidos,
-                'email'              => $data['email']              ?? $docente->email,
-                'telefono'           => $data['telefono']           ?? $docente->telefono,
-                'titulo'             => $data['titulo']             ?? $docente->titulo,
-                'grado_academico'    => $data['grado_academico']    ?? $docente->grado_academico,
-                'diplomado_docencia' => $data['diplomado_docencia'] ?? $docente->diplomado_docencia,
-            ]);
+            // Usar DB::table para boolean — evita el problema con PDO::ATTR_EMULATE_PREPARES.
+            $updateData = array_filter([
+                'ci'              => $data['ci']              ?? null,
+                'nombres'         => $data['nombres']         ?? null,
+                'apellidos'       => $data['apellidos']       ?? null,
+                'email'           => $data['email']           ?? null,
+                'telefono'        => $data['telefono']        ?? null,
+                'titulo'          => $data['titulo']          ?? null,
+                'grado_academico' => $data['grado_academico'] ?? null,
+            ], fn($v) => $v !== null);
 
-            // Sincronizar nombre en la cuenta de usuario si existe.
-            if ($docente->user_id && ($data['nombres'] ?? null || $data['apellidos'] ?? null)) {
-                $docente->user->update([
+            if (! empty($updateData)) {
+                DB::table('docentes')->where('id', $docente->id)->update($updateData);
+            }
+
+            // diplomado_docencia se actualiza separado con DB::raw por ser boolean.
+            if (isset($data['diplomado_docencia'])) {
+                DB::table('docentes')->where('id', $docente->id)->update([
+                    'diplomado_docencia' => $data['diplomado_docencia']
+                        ? DB::raw('TRUE') : DB::raw('FALSE'),
+                ]);
+            }
+
+            // Sincronizar nombre en users si existe cuenta.
+            $docente->refresh();
+            if ($docente->user_id && (isset($data['nombres']) || isset($data['apellidos']))) {
+                DB::table('users')->where('id', $docente->user_id)->update([
                     'name' => trim($docente->nombres . ' ' . $docente->apellidos),
                 ]);
             }
@@ -163,7 +177,6 @@ class DocenteController extends Controller
         });
 
         $docente->load('user');
-
         return new DocenteResource($docente->fresh());
     }
 

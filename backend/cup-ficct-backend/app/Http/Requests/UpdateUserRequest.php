@@ -29,7 +29,7 @@ class UpdateUserRequest extends FormRequest
             ],
             // Contraseña opcional en edición — mínimo 8 si se envía.
             'password' => ['nullable', 'string', 'min:8'],
-            'rol'      => ['sometimes', 'required', Rule::in(['admin', 'coordinador_academico', 'autoridad', 'docente'])],
+            'rol'      => ['sometimes', 'required', Rule::in(['admin', 'coordinador_academico', 'autoridad'])],
         ];
     }
 

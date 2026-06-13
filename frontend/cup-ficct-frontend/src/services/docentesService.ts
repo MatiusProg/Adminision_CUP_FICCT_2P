@@ -16,11 +16,7 @@ export interface Docente {
   diplomado_docencia: boolean;
   activo: boolean;
   user_id: number | null;
-  user?: {
-    id: number;
-    email: string;
-    name: string;
-  } | null;
+  user?: { id: number; email: string; name: string } | null;
 }
 
 export interface DocenteInput {
@@ -32,22 +28,30 @@ export interface DocenteInput {
   titulo?: string;
   grado_academico: GradoAcademico;
   diplomado_docencia?: boolean;
-  // Campos opcionales para crear cuenta de acceso al sistema.
   crear_cuenta?: boolean;
   password?: string;
 }
 
 export type DocenteUpdateInput = Partial<Omit<DocenteInput, "crear_cuenta" | "password">>;
 
+export interface PaginatedDocentes {
+  data: Docente[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    total: number;
+    per_page: number;
+  };
+}
+
 export const docentesService = {
-  list(params?: { search?: string; activo?: boolean }) {
+  list(params?: { search?: string; activo?: boolean; page?: number }) {
     const query = new URLSearchParams();
     if (params?.search) query.set("search", params.search);
     if (params?.activo !== undefined) query.set("activo", String(params.activo));
+    if (params?.page) query.set("page", String(params.page));
     const qs = query.toString();
-    return apiClient.get<{ data: Docente[]; meta: { total: number } }>(
-      `/docentes${qs ? `?${qs}` : ""}`
-    );
+    return apiClient.get<PaginatedDocentes>(`/docentes${qs ? `?${qs}` : ""}`);
   },
   show(id: number) {
     return apiClient.get<{ data: Docente }>(`/docentes/${id}`);

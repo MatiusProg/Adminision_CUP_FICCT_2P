@@ -59,8 +59,8 @@ class UserController extends Controller
             $activo = filter_var($request->query('activo'), FILTER_VALIDATE_BOOLEAN);
             $query->whereRaw($activo ? '"activo" = TRUE' : '"activo" = FALSE');
         }
-
-        $users = $query->orderBy('name')->paginate(15);
+        $perPage  = (int) $request->query('per_page', 15);
+        $users = $query->orderBy('name')->paginate($perPage);
 
         return UserResource::collection($users)->response();
     }
