@@ -10,8 +10,12 @@ use App\Http\Controllers\Api\PostulanteController;
 use Illuminate\Support\Facades\Route;
 //CU23 -KAREN
 use App\Http\Controllers\Api\PostulantePortalController;
-//CU22 - MATEP
+//CU22 - MATEO
 use App\Http\Controllers\Api\PasswordResetController;
+//CU-02 - MATEO
+use App\Http\Controllers\Api\UserController;
+//CU-11 - KAREN
+use App\Http\Controllers\Api\DocenteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,5 +91,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:postulante')->group(function () {
         Route::get('/postulante/mis-materias', [PostulantePortalController::class, 'misMaterias']);
         Route::get('/postulante/mis-notas',    [PostulantePortalController::class, 'misNotas']);
+    });
+
+    // UC-02: Gestión de usuarios internos — solo admin
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/usuarios',                       [UserController::class, 'index']);
+        Route::get('/usuarios/{user}',                [UserController::class, 'show']);
+        Route::post('/usuarios',                      [UserController::class, 'store']);
+        Route::put('/usuarios/{user}',                [UserController::class, 'update']);
+        Route::put('/usuarios/{user}/desactivar',     [UserController::class, 'desactivar']);
+        Route::put('/usuarios/{user}/reactivar',      [UserController::class, 'reactivar']);
+    });
+
+    // UC-11: Gestión de docentes — admin y coordinador_academico
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/docentes',                         [DocenteController::class, 'index']);
+        Route::get('/docentes/{docente}',               [DocenteController::class, 'show']);
+        Route::post('/docentes',                        [DocenteController::class, 'store']);
+        Route::put('/docentes/{docente}',               [DocenteController::class, 'update']);
+        Route::put('/docentes/{docente}/desactivar',    [DocenteController::class, 'desactivar']);
+        Route::put('/docentes/{docente}/reactivar',     [DocenteController::class, 'reactivar']);
     });
 });

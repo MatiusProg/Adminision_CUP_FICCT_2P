@@ -27,6 +27,10 @@ import { MisNotasPage } from "@/pages/Postulantes/MisNotasPage";
 // CU-22 Recuperación de contraseña
 import { ForgotPasswordPage } from "@/pages/Auth/ForgotPasswordPage";
 import { ResetPasswordPage } from "@/pages/Auth/ResetPasswordPage";
+// CU-02 Gestión de usuarios del sistema (admin, coordinadores, autoridades y docentes)
+import { UsuariosPage } from "@/pages/Admin/UsuariosPage";
+// CU-11 Gestión de docentes
+import { DocentesPage } from "@/pages/Admin/DocentesPage";
 
 // ── Redirección según rol ─────────────────────────────────────────────────────
 function HomeRedirect() {
@@ -165,10 +169,7 @@ export default function App() {
                   path="/usuarios"
                   element={
                     <ProtectedRoute roles={["admin"]}>
-                      <PlaceholderPage
-                        title="Usuarios del sistema"
-                        description="Gestión de usuarios internos: admin, coordinadores, autoridades y docentes."
-                      />
+                      <UsuariosPage />
                     </ProtectedRoute>
                   }
                 />
@@ -198,7 +199,7 @@ export default function App() {
                   path="/docentes"
                   element={
                     <ProtectedRoute roles={["admin"]}>
-                      <PlaceholderPage title="Docentes" />
+                      <DocentesPage />
                     </ProtectedRoute>
                   }
                 />
