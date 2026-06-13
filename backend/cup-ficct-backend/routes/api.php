@@ -8,7 +8,10 @@ use App\Http\Controllers\Api\GestionController;
 use App\Http\Controllers\Api\PagoController;
 use App\Http\Controllers\Api\PostulanteController;
 use Illuminate\Support\Facades\Route;
+//CU23 -KAREN
 use App\Http\Controllers\Api\PostulantePortalController;
+//CU22 - MATEP
+use App\Http\Controllers\Api\PasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +26,9 @@ use App\Http\Controllers\Api\PostulantePortalController;
 Route::post('/auth/login', [AuthController::class, 'login']);
 // Webhook de Stripe: público (Stripe no envía token); la firma se verifica dentro.
 Route::post('/pagos/webhook', [PagoController::class, 'webhook']);
+// UC-22: recuperación de contraseña — públicas (no requieren token)
+Route::post('/auth/forgot-password', [PasswordResetController::class, 'forgotPassword']);
+Route::post('/auth/reset-password',  [PasswordResetController::class, 'resetPassword']);
 
 // ----- Protegidas (requieren token Sanctum) -----
 Route::middleware('auth:sanctum')->group(function () {

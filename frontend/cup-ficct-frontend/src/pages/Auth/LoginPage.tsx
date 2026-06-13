@@ -1,11 +1,13 @@
 // Página de inicio de sesión (UC-01) — rediseñada con identidad FICCT.
 // Panel partido: lado izquierdo institucional (escudo + marca), lado derecho
 // el formulario. Fondo atmosférico con resplandor cian. Responsive.
+// Mejoras UC-22: ojo para mostrar/ocultar contraseña, link "¿Olvidó su contraseña?",
+// botón deshabilitado si los campos están vacíos.
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
-import { GraduationCap, ShieldCheck } from "lucide-react";
+import { GraduationCap, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/apiClient";
 import { Logo } from "@/components/Logo";
@@ -21,12 +23,14 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  // Controla la visibilidad de la contraseña.
+  const [showPassword, setShowPassword] = useState(false);
+
+  // El botón solo se habilita si ambos campos tienen contenido.
+  const canSubmit = email.trim().length > 0 && password.length > 0;
 
   async function handleSubmit() {
-    if (!email || !password) {
-      toast.error("Complete el correo y la contraseña.");
-      return;
-    }
+    if (!canSubmit) return;
     setSubmitting(true);
     try {
       await login(email, password);
@@ -100,7 +104,7 @@ export function LoginPage() {
       {/* ---- Panel derecho: formulario ---- */}
       <div className="bg-ficct-glow flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-sm">
-          {/* Logo compacto solo visible en móvil (cuando el panel izquierdo se oculta) */}
+          {/* Logo compacto solo visible en móvil */}
           <div className="mb-8 flex flex-col items-center text-center lg:hidden">
             <Logo size={80} />
             <h1 className="mt-4 font-heading text-2xl font-bold">CUP-FICCT</h1>
@@ -115,6 +119,7 @@ export function LoginPage() {
           </div>
 
           <div className="grid gap-5">
+            {/* Campo email */}
             <div className="grid gap-2">
               <Label htmlFor="email">Correo electrónico</Label>
               <Input
@@ -129,23 +134,51 @@ export function LoginPage() {
               />
             </div>
 
+            {/* Campo contraseña con ojo */}
             <div className="grid gap-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                className="h-11"
-              />
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Contraseña</Label>
+                {/* Link de recuperación — solo para usuarios internos */}
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-primary hover:underline"
+                  tabIndex={-1}
+                >
+                  ¿Olvidó su contraseña?
+                </Link>
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                  className="h-11 pr-10"
+                />
+                {/* Botón ojo para mostrar/ocultar contraseña */}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
+            {/* Botón de login — deshabilitado si campos vacíos */}
             <Button
               onClick={handleSubmit}
-              disabled={submitting}
+              disabled={submitting || !canSubmit}
               className="mt-2 h-11 text-base font-semibold"
             >
               {submitting ? "Ingresando..." : "Iniciar sesión"}

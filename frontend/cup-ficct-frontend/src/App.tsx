@@ -20,8 +20,13 @@ import { CarrerasPage } from "@/pages/Admin/CarrerasPage";
 import { ConfiguracionPage } from "@/pages/Admin/ConfiguracionPage";
 import { GestionesPage } from "@/pages/Admin/GestionesPage";
 import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
+// ------------------- CICLO 2 -------------------
+// CU-23 Consulta del Postulante 
 import { MisMateriasPage } from "@/pages/Postulantes/MisMateriasPage";
 import { MisNotasPage } from "@/pages/Postulantes/MisNotasPage";
+// CU-22 Recuperación de contraseña
+import { ForgotPasswordPage } from "@/pages/Auth/ForgotPasswordPage";
+import { ResetPasswordPage } from "@/pages/Auth/ResetPasswordPage";
 
 // ── Redirección según rol ─────────────────────────────────────────────────────
 function HomeRedirect() {
@@ -57,13 +62,13 @@ export default function App() {
               <Route path="/pago/exito" element={<PagoExitoPage />} />
               <Route path="/pago/cancelado" element={<PagoCanceladoPage />} />
               {/* UC-22: recuperar contraseña — públicas, se implementan en Fase 5 */}
-              <Route
+             <Route
                 path="/forgot-password"
-                element={<PlaceholderPage title="Recuperar contraseña" description="Módulo de recuperación de contraseña. Próximamente disponible." />}
+                element={<ForgotPasswordPage />}
               />
               <Route
                 path="/reset-password"
-                element={<PlaceholderPage title="Nueva contraseña" description="Módulo de restablecimiento de contraseña. Próximamente disponible." />}
+                element={<ResetPasswordPage />}
               />
 
               {/* ── Rutas protegidas con layout ──────────────────────────── */}
