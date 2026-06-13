@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\DocenteController;
 //CU-14/15 - MATEO
 use App\Http\Controllers\Api\GrupoController;
+//CU-16 - MATEO
+use App\Http\Controllers\Api\CupoController;
 //CU-12/13 - KAREN
 use App\Http\Controllers\Api\NotaController;
 
@@ -131,6 +133,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/grupos/{grupo}/docente',             [GrupoController::class, 'desasignarDocente']);
     });
 
+    // UC-16: Asignación de cupos por carrera
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/cupos/asignar',   [CupoController::class, 'asignar']);
+        Route::get('/cupos/ranking',    [CupoController::class, 'ranking']);
+        Route::get('/cupos/resumen',    [CupoController::class, 'resumen']);
+    });
+    
     // UC-12/13: Registro y cálculo de notas
     Route::middleware('role:admin,coordinador_academico')->group(function () {
         Route::get('/notas/materia/{materia}',          [NotaController::class, 'porMateria']);
