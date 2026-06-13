@@ -152,7 +152,6 @@ export const menuPackages: MenuPackage[] = [
         path: "/mis-grupos",
         icon: Group,
         roles: ["docente"],
-        placeholder: true,
         // UC-17: el docente ve sus grupos, horarios y carga
       },
     ],

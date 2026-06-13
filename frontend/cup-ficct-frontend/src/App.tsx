@@ -37,6 +37,8 @@ import { GruposPage } from "@/pages/Admin/GruposPage";
 import { CuposPage } from "@/pages/Admin/CuposPage";
 // CU12/13 Registro de notas y cálculo de promedios
 import { NotasPage } from "@/pages/Admin/NotasPage";
+// CU17 Consulta de grupos asignados (docente)
+import { MisGruposPage } from "@/pages/Admin/MisGruposPage";
 
 // ── Redirección según rol ─────────────────────────────────────────────────────
 function HomeRedirect() {
@@ -229,7 +231,7 @@ export default function App() {
                   path="/mis-grupos"
                   element={
                     <ProtectedRoute roles={["docente"]}>
-                      <PlaceholderPage title="Mis grupos" />
+                      <MisGruposPage />
                     </ProtectedRoute>
                   }
                 />
