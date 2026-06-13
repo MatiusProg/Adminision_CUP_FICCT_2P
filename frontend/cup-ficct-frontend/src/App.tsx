@@ -20,8 +20,19 @@ import { CarrerasPage } from "@/pages/Admin/CarrerasPage";
 import { ConfiguracionPage } from "@/pages/Admin/ConfiguracionPage";
 import { GestionesPage } from "@/pages/Admin/GestionesPage";
 import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
+// ------------------- CICLO 2 -------------------
+// CU-23 Consulta del Postulante 
 import { MisMateriasPage } from "@/pages/Postulantes/MisMateriasPage";
 import { MisNotasPage } from "@/pages/Postulantes/MisNotasPage";
+// CU-22 Recuperación de contraseña
+import { ForgotPasswordPage } from "@/pages/Auth/ForgotPasswordPage";
+import { ResetPasswordPage } from "@/pages/Auth/ResetPasswordPage";
+// CU-02 Gestión de usuarios del sistema (admin, coordinadores, autoridades y docentes)
+import { UsuariosPage } from "@/pages/Admin/UsuariosPage";
+// CU-11 Gestión de docentes
+import { DocentesPage } from "@/pages/Admin/DocentesPage";
+// CU14/15 Gestión de grupos y asignación de docentes a grupos
+import { GruposPage } from "@/pages/Admin/GruposPage";
 
 // ── Redirección según rol ─────────────────────────────────────────────────────
 function HomeRedirect() {
@@ -57,13 +68,13 @@ export default function App() {
               <Route path="/pago/exito" element={<PagoExitoPage />} />
               <Route path="/pago/cancelado" element={<PagoCanceladoPage />} />
               {/* UC-22: recuperar contraseña — públicas, se implementan en Fase 5 */}
-              <Route
+             <Route
                 path="/forgot-password"
-                element={<PlaceholderPage title="Recuperar contraseña" description="Módulo de recuperación de contraseña. Próximamente disponible." />}
+                element={<ForgotPasswordPage />}
               />
               <Route
                 path="/reset-password"
-                element={<PlaceholderPage title="Nueva contraseña" description="Módulo de restablecimiento de contraseña. Próximamente disponible." />}
+                element={<ResetPasswordPage />}
               />
 
               {/* ── Rutas protegidas con layout ──────────────────────────── */}
@@ -160,10 +171,7 @@ export default function App() {
                   path="/usuarios"
                   element={
                     <ProtectedRoute roles={["admin"]}>
-                      <PlaceholderPage
-                        title="Usuarios del sistema"
-                        description="Gestión de usuarios internos: admin, coordinadores, autoridades y docentes."
-                      />
+                      <UsuariosPage />
                     </ProtectedRoute>
                   }
                 />
@@ -193,17 +201,17 @@ export default function App() {
                   path="/docentes"
                   element={
                     <ProtectedRoute roles={["admin"]}>
-                      <PlaceholderPage title="Docentes" />
+                      <DocentesPage />
                     </ProtectedRoute>
                   }
                 />
                 <Route
-                  path="/grupos"
-                  element={
-                    <ProtectedRoute roles={["admin"]}>
-                      <PlaceholderPage title="Grupos" />
-                    </ProtectedRoute>
-                  }
+                   path="/grupos"
+                   element={
+                     <ProtectedRoute roles={["admin"]}>
+                       <GruposPage />
+                     </ProtectedRoute>
+                   }
                 />
                 <Route
                   path="/cupos"

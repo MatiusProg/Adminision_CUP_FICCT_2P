@@ -132,7 +132,6 @@ export const menuPackages: MenuPackage[] = [
         path: "/docentes",
         icon: GraduationCap,
         roles: ["admin"],
-        placeholder: true,
         // UC-11: CRUD de docentes con cuenta de usuario opcional
       },
       {
@@ -140,7 +139,6 @@ export const menuPackages: MenuPackage[] = [
         path: "/grupos",
         icon: Group,
         roles: ["admin"],
-        placeholder: true,
         // UC-14/15: generación automática y asignación de docentes a grupos
       },
       {

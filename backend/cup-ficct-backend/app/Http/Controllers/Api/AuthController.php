@@ -45,6 +45,14 @@ class AuthController extends Controller
             ]);
         }
 
+        // Verificar que la cuenta esté activa.
+        // Mensaje genérico para no revelar si existe la cuenta.
+        if (! $user->activo) {
+            throw ValidationException::withMessages([
+                'email' => ['Su cuenta ha sido desactivada. Contacte al Administrador.'],
+            ]);
+        }
+        
         // Token de acceso Sanctum; el nombre ayuda a identificarlo en la tabla.
         $token = $user->createToken('cup-spa')->plainTextToken;
 

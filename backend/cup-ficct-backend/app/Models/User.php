@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 
 /**
  * Modelo User — usuario del sistema. Todos los roles (incluido postulante)
@@ -55,4 +56,19 @@ class User extends Authenticatable
     {
         return $query->whereRaw('"activo" = TRUE');
     }
+
+    /**
+     * Personaliza el link de reset para apuntar al frontend React.
+     * Sin esto, Laravel busca la ruta web 'password.reset' que no existe en API pura.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        ResetPasswordNotification::createUrlUsing(function ($notifiable, $token) {
+            return config('app.frontend_url') . '/reset-password'
+                . '?token=' . $token
+                . '&email=' . urlencode($notifiable->email);
+        });
+
+        $this->notify(new ResetPasswordNotification($token));
+}
 }

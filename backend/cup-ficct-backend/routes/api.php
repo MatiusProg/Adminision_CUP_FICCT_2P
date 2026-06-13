@@ -8,7 +8,16 @@ use App\Http\Controllers\Api\GestionController;
 use App\Http\Controllers\Api\PagoController;
 use App\Http\Controllers\Api\PostulanteController;
 use Illuminate\Support\Facades\Route;
+//CU23 -KAREN
 use App\Http\Controllers\Api\PostulantePortalController;
+//CU22 - MATEO
+use App\Http\Controllers\Api\PasswordResetController;
+//CU-02 - MATEO
+use App\Http\Controllers\Api\UserController;
+//CU-11 - KAREN
+use App\Http\Controllers\Api\DocenteController;
+//CU-14/15 - MATEO
+use App\Http\Controllers\Api\GrupoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +32,9 @@ use App\Http\Controllers\Api\PostulantePortalController;
 Route::post('/auth/login', [AuthController::class, 'login']);
 // Webhook de Stripe: público (Stripe no envía token); la firma se verifica dentro.
 Route::post('/pagos/webhook', [PagoController::class, 'webhook']);
+// UC-22: recuperación de contraseña — públicas (no requieren token)
+Route::post('/auth/forgot-password', [PasswordResetController::class, 'forgotPassword']);
+Route::post('/auth/reset-password',  [PasswordResetController::class, 'resetPassword']);
 
 // ----- Protegidas (requieren token Sanctum) -----
 Route::middleware('auth:sanctum')->group(function () {
@@ -81,5 +93,39 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:postulante')->group(function () {
         Route::get('/postulante/mis-materias', [PostulantePortalController::class, 'misMaterias']);
         Route::get('/postulante/mis-notas',    [PostulantePortalController::class, 'misNotas']);
+    });
+
+    // UC-02: Gestión de usuarios internos — solo admin
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/usuarios',                       [UserController::class, 'index']);
+        Route::get('/usuarios/{user}',                [UserController::class, 'show']);
+        Route::post('/usuarios',                      [UserController::class, 'store']);
+        Route::put('/usuarios/{user}',                [UserController::class, 'update']);
+        Route::put('/usuarios/{user}/desactivar',     [UserController::class, 'desactivar']);
+        Route::put('/usuarios/{user}/reactivar',      [UserController::class, 'reactivar']);
+    });
+
+    // UC-11: Gestión de docentes — admin y coordinador_academico
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/docentes',                         [DocenteController::class, 'index']);
+        Route::get('/docentes/{docente}',               [DocenteController::class, 'show']);
+        Route::post('/docentes',                        [DocenteController::class, 'store']);
+        Route::put('/docentes/{docente}',               [DocenteController::class, 'update']);
+        Route::put('/docentes/{docente}/desactivar',    [DocenteController::class, 'desactivar']);
+        Route::put('/docentes/{docente}/reactivar',     [DocenteController::class, 'reactivar']);
+    });
+
+    // UC-14/15: Gestión de grupos — admin y coordinador
+    Route::middleware('role:admin,coordinador_academico')->group(function () {
+        // UC-14: generación y edición de grupos
+        Route::get('/grupos',                                [GrupoController::class, 'index']);
+        Route::get('/grupos/horarios',                       [GrupoController::class, 'horarios']);
+        Route::post('/grupos/generar',                       [GrupoController::class, 'generar']);
+        Route::put('/grupos/{grupo}/horario',                [GrupoController::class, 'actualizarHorario']);
+    
+        // UC-15: asignación de docentes con validaciones
+        Route::get('/grupos/{grupo}/docentes-disponibles',   [GrupoController::class, 'docentesDisponibles']);
+        Route::put('/grupos/{grupo}/asignar-docente',        [GrupoController::class, 'asignarDocente']);
+        Route::delete('/grupos/{grupo}/docente',             [GrupoController::class, 'desasignarDocente']);
     });
 });
