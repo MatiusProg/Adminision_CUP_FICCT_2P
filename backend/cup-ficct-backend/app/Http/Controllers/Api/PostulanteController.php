@@ -102,6 +102,13 @@ class PostulanteController extends Controller
     public function destroy(Request $request, Postulante $postulante): JsonResponse
     {
         $datosPrevios = $postulante->toArray();
+        
+        // Eliminar también el usuario asociado para liberar el email.
+        // Sin esto, un re-registro del mismo postulante falla por unique en users.email.
+        if ($postulante->user_id) {
+            \App\Models\User::destroy($postulante->user_id);
+        }
+        
         $postulante->delete();
 
         $this->audit->log('eliminar', 'Postulante', $datosPrevios['id'], $datosPrevios, $request);
