@@ -33,6 +33,8 @@ import { UsuariosPage } from "@/pages/Admin/UsuariosPage";
 import { DocentesPage } from "@/pages/Admin/DocentesPage";
 // CU14/15 Gestión de grupos y asignación de docentes a grupos
 import { GruposPage } from "@/pages/Admin/GruposPage";
+// CU12/13 Registro de notas y cálculo de promedios
+import { NotasPage } from "@/pages/Admin/NotasPage";
 
 // ── Redirección según rol ─────────────────────────────────────────────────────
 function HomeRedirect() {
@@ -182,7 +184,7 @@ export default function App() {
                   path="/notas"
                   element={
                     <ProtectedRoute roles={["admin", "coordinador_academico"]}>
-                      <PlaceholderPage title="Registro de notas" />
+                      <NotasPage />
                     </ProtectedRoute>
                   }
                 />
@@ -190,7 +192,7 @@ export default function App() {
                   path="/notas/calcular"
                   element={
                     <ProtectedRoute roles={["admin", "coordinador_academico"]}>
-                      <PlaceholderPage title="Calcular promedios" />
+                      <NotasPage />
                     </ProtectedRoute>
                   }
                 />
