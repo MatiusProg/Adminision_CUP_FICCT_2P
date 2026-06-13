@@ -33,6 +33,8 @@ import { UsuariosPage } from "@/pages/Admin/UsuariosPage";
 import { DocentesPage } from "@/pages/Admin/DocentesPage";
 // CU14/15 Gestión de grupos y asignación de docentes a grupos
 import { GruposPage } from "@/pages/Admin/GruposPage";
+// CU16 Asignación de cupos por carrera (admin)
+import { CuposPage } from "@/pages/Admin/CuposPage";
 
 // ── Redirección según rol ─────────────────────────────────────────────────────
 function HomeRedirect() {
@@ -217,7 +219,7 @@ export default function App() {
                   path="/cupos"
                   element={
                     <ProtectedRoute roles={["admin"]}>
-                      <PlaceholderPage title="Asignación de cupos" />
+                      <CuposPage />
                     </ProtectedRoute>
                   }
                 />

@@ -146,7 +146,6 @@ export const menuPackages: MenuPackage[] = [
         path: "/cupos",
         icon: Award,
         roles: ["admin"],
-        placeholder: true,
         // UC-16: algoritmo de asignación a carrera por promedio
       },
       {
