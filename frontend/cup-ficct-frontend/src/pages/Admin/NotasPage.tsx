@@ -2,10 +2,11 @@
 // Vista A: tabla por materia (registro masivo por examen).
 // Vista B: búsqueda por postulante (ver/editar notas de un alumno específico).
 
-import { useEffect, useState} from "react";
+import { useEffect, useState, useRef} from "react";
 import {
   BookOpen, Search, Calculator, CheckCircle2, XCircle,
   Loader2, AlertCircle, Save, RefreshCw,
+  Upload, Download,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/context/useConfirm";
@@ -57,6 +58,8 @@ function VistaPorMateria() {
   const [guardando, setGuardando] = useState(false);
   // Notas editadas en la UI — clave: postulante_id, valor: calificación string
   const [notasEditadas, setNotasEditadas] = useState<Record<number, string>>({});
+  const [importando, setImportando] = useState(false);
+  const inputFileRef = useRef<HTMLInputElement>(null);
 
   async function cargar() {
     setLoading(true);
@@ -136,6 +139,72 @@ function VistaPorMateria() {
   const materia = MATERIAS.find((m) => m.id === materiaId);
   const hayModificaciones = Object.keys(notasEditadas).length > 0;
 
+  async function descargarPlantilla() {
+    const token = localStorage.getItem("cup_token");
+    const url   = `${import.meta.env.VITE_API_URL}/notas/plantilla/${materiaId}`;
+    try {
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("No se pudo descargar la plantilla.");
+      const blob = await res.blob();
+      const link = document.createElement("a");
+      link.href  = URL.createObjectURL(blob);
+      const materia = MATERIAS.find((m) => m.id === materiaId);
+      link.download = `plantilla_notas_${materia?.codigo ?? materiaId}.xlsx`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } catch {
+      toast.error("No se pudo descargar la plantilla.");
+    }
+  }
+
+  async function handleImportar(e: React.ChangeEvent<HTMLInputElement>) {
+    const archivo = e.target.files?.[0];
+    if (!archivo) return;
+  
+    // Limpiar el input para permitir subir el mismo archivo de nuevo.
+    e.target.value = "";
+  
+    setImportando(true);
+    try {
+      const token    = localStorage.getItem("cup_token");
+      const formData = new FormData();
+      formData.append("materia_id", String(materiaId));
+      formData.append("archivo", archivo);
+  
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/notas/importar`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+  
+      const json = await res.json();
+  
+      if (!res.ok) {
+        toast.error(json.message ?? "Error al importar.");
+        return;
+      }
+  
+      const { omitidas, errores } = json.data;
+      toast.success(`${json.message}${omitidas > 0 ? ` (${omitidas} omitidas)` : ""}`);
+  
+      if (errores?.length > 0) {
+        // Mostrar los primeros 3 errores para no saturar la UI.
+        errores.slice(0, 3).forEach((err: string) => toast.error(err));
+        if (errores.length > 3) {
+          toast.error(`... y ${errores.length - 3} errores más. Revise el archivo.`);
+        }
+      }
+  
+      cargar(); // Recargar notas tras importar.
+    } catch {
+      toast.error("No se pudo conectar al servidor.");
+    } finally {
+      setImportando(false);
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* Controles */}
@@ -171,7 +240,31 @@ function VistaPorMateria() {
           <Button variant="outline" onClick={cargar} className="gap-1.5">
             <RefreshCw className="h-3.5 w-3.5" /> Recargar
           </Button>
-
+          
+          {/* Descargar plantilla */}
+          <Button variant="outline" onClick={descargarPlantilla} className="gap-1.5">
+            <Download className="h-3.5 w-3.5" /> Plantilla Excel
+          </Button>
+        
+          {/* Importar notas */}
+          <Button
+            variant="outline"
+            onClick={() => inputFileRef.current?.click()}
+            disabled={importando}
+            className="gap-1.5"
+          >
+            {importando
+              ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              : <Upload className="h-3.5 w-3.5" />}
+            {importando ? "Importando..." : "Importar Excel"}
+          </Button>
+          <input
+            ref={inputFileRef}
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            className="hidden"
+            onChange={handleImportar}
+          />
           <div className="flex-1" />
 
           {/* Guardar lote */}

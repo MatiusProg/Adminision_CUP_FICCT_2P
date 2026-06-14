@@ -22,6 +22,11 @@ use App\Http\Controllers\Api\GrupoController;
 use App\Http\Controllers\Api\CupoController;
 //CU-12/13 - KAREN
 use App\Http\Controllers\Api\NotaController;
+//CU-17 - MATEO
+use App\Http\Controllers\Api\MisGruposController;
+use App\Http\Controllers\Api\ImportNotasController;
+//CU-18/19 - KAREN
+use App\Http\Controllers\Api\ReporteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -148,5 +153,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/notas/registrar-lote',            [NotaController::class, 'registrarLote']);
         Route::post('/notas/calcular/{postulante}',     [NotaController::class, 'calcularPostulante']);
         Route::post('/notas/calcular-todos',            [NotaController::class, 'calcularTodos']);
+    });
+
+    // UC-17: Portal del docente — solo docentes autenticados
+    Route::middleware('role:docente')->group(function () {
+        Route::get('/docente/mis-grupos',          [MisGruposController::class, 'index']);
+        Route::get('/docente/mis-grupos/{grupo}',  [MisGruposController::class, 'show']);
+    });
+
+    // Carga masiva de notas por Excel/CSV
+    Route::get('/notas/plantilla/{materia}',  [ImportNotasController::class, 'descargarPlantilla']);
+    Route::post('/notas/importar',            [ImportNotasController::class, 'importar']);
+
+    // UC-18/19: Reportes PDF y Excel
+    Route::middleware('role:admin,autoridad')->group(function () {
+        Route::get('/reportes/preview', [ReporteController::class, 'preview']);
+        Route::get('/reportes/pdf',     [ReporteController::class, 'pdf']);
+        Route::get('/reportes/excel',   [ReporteController::class, 'excel']);
     });
 });

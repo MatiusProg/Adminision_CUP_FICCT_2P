@@ -152,7 +152,6 @@ export const menuPackages: MenuPackage[] = [
         path: "/mis-grupos",
         icon: Group,
         roles: ["docente"],
-        placeholder: true,
         // UC-17: el docente ve sus grupos, horarios y carga
       },
     ],
@@ -170,7 +169,6 @@ export const menuPackages: MenuPackage[] = [
         path: "/reportes",
         icon: FileBarChart,
         roles: ["admin", "autoridad"],
-        placeholder: true,
         // UC-18/19: reportes dinámicos con filtros + preview + descarga PDF/Excel
       },
     ],

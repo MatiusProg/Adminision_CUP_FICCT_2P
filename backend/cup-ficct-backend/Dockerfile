@@ -17,7 +17,8 @@ RUN install-php-extensions \
     pgsql \
     intl \
     zip \
-    opcache
+    opcache \
+    gd
 
 # ---- Composer (lo copiamos desde la imagen oficial de composer) ----
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
