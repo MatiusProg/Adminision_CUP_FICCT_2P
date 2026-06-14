@@ -25,6 +25,8 @@ use App\Http\Controllers\Api\NotaController;
 //CU-17 - MATEO
 use App\Http\Controllers\Api\MisGruposController;
 use App\Http\Controllers\Api\ImportNotasController;
+//CU-18/19 - KAREN
+use App\Http\Controllers\Api\ReporteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -162,4 +164,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Carga masiva de notas por Excel/CSV
     Route::get('/notas/plantilla/{materia}',  [ImportNotasController::class, 'descargarPlantilla']);
     Route::post('/notas/importar',            [ImportNotasController::class, 'importar']);
+
+    // UC-18/19: Reportes PDF y Excel
+    Route::middleware('role:admin,autoridad')->group(function () {
+        Route::get('/reportes/preview', [ReporteController::class, 'preview']);
+        Route::get('/reportes/pdf',     [ReporteController::class, 'pdf']);
+        Route::get('/reportes/excel',   [ReporteController::class, 'excel']);
+    });
 });

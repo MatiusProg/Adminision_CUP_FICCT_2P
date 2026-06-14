@@ -9,7 +9,7 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ConfirmProvider } from "@/context/useConfirm";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
-import { PlaceholderPage } from "@/components/PlaceholderPage";
+//import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 // ── Páginas implementadas ─────────────────────────────────────────────────────
 import { LoginPage } from "@/pages/Auth/LoginPage";
@@ -39,6 +39,8 @@ import { CuposPage } from "@/pages/Admin/CuposPage";
 import { NotasPage } from "@/pages/Admin/NotasPage";
 // CU17 Consulta de grupos asignados (docente)
 import { MisGruposPage } from "@/pages/Admin/MisGruposPage";
+// CU18/19 Reportes para autoridades (admin y autoridad)
+import { ReportesPage } from "@/pages/Admin/ReportesPage";
 
 // ── Redirección según rol ─────────────────────────────────────────────────────
 function HomeRedirect() {
@@ -242,7 +244,7 @@ export default function App() {
                   path="/reportes"
                   element={
                     <ProtectedRoute roles={["admin", "autoridad"]}>
-                      <PlaceholderPage title="Reportes" />
+                      <ReportesPage />
                     </ProtectedRoute>
                   }
                 />

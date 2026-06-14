@@ -169,7 +169,6 @@ export const menuPackages: MenuPackage[] = [
         path: "/reportes",
         icon: FileBarChart,
         roles: ["admin", "autoridad"],
-        placeholder: true,
         // UC-18/19: reportes dinámicos con filtros + preview + descarga PDF/Excel
       },
     ],
