@@ -43,6 +43,12 @@
   Fórmula: Examen 1 (30%) + Examen 2 (30%) + Examen 3 (40%) | Mínimo aprobatorio: 60 pts
 </div>
 
+@if($truncado)
+<div style="background:#fef9c3;border:1px solid #ca8a04;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:8px;color:#92400e;">
+  ⚠ Este PDF muestra los primeros {{ $limite }} registros de {{ $total ?? 'N/A' }}. Para el conjunto completo, use <strong>Descargar Excel</strong>.
+</div>
+@endif
+
 <table>
   <thead>
     <tr class="main">

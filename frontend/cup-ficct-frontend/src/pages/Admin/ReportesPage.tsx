@@ -38,7 +38,7 @@ const ESTADOS  = [
 ];
 const CARRERAS = [
   { value: "1", label: "Ingeniería en Sistemas" }, { value: "2", label: "Ingeniería en Telecomunicaciones" },
-  { value: "3", label: "Ingeniería Informática"  }, { value: "4", label: "Licenciatura en Informática"    },
+  { value: "3", label: "Ingeniería Informática"  }, { value: "4", label: "Ingeniería Robótica"    },
 ];
 const MATERIAS = [
   { value: "1", label: "Computación" }, { value: "2", label: "Matemáticas" },
@@ -126,10 +126,17 @@ export function ReportesPage() {
   }
 
   async function handlePdf() {
+    // Avisar si hay muchos registros.
+    if (preview && preview.total > 200) {
+      toast.warning(`El PDF se limitará a 200 de ${preview.total} registros. Para el total use Excel.`);
+    }
     setDescargandoPdf(true);
-    try { await reportesService.descargarPdf(buildFiltros()); toast.success("PDF descargado."); }
-    catch (err: unknown) { toast.error((err as Error).message ?? "Error al generar PDF."); }
-    finally { setDescargandoPdf(false); }
+    try {
+      await reportesService.descargarPdf(buildFiltros());
+      toast.success("PDF descargado.");
+    } catch (err: unknown) {
+      toast.error((err as Error).message ?? "Error al generar PDF.");
+    } finally { setDescargandoPdf(false); }
   }
 
   async function handleExcel() {
