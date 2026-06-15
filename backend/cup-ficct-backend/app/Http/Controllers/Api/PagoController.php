@@ -9,6 +9,7 @@ use App\Services\PagoStripeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+
 /**
  * Controlador de pagos de inscripción vía Stripe (UC-06 / UC-07).
  */

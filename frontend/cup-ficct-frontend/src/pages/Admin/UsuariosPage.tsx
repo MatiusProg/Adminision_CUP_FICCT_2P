@@ -44,6 +44,7 @@ const formVacio: UsuarioInput & { id?: number } = {
   name: "", email: "", password: "", rol: "coordinador_academico",
 };
 
+
 // ── Modal crear/editar ────────────────────────────────────────────────────────
 function UsuarioModal({ open, usuario, onClose, onSaved }: {
   open: boolean; usuario: Usuario | null; onClose: () => void; onSaved: () => void;
