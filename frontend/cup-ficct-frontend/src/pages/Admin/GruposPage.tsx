@@ -48,6 +48,7 @@ function EditarHorarioModal({ open, grupo, horarios, onClose, onSaved }: {
   const [aula, setAula] = useState("");
   const [horario, setHorario] = useState("");
   const [saving, setSaving] = useState(false);
+  
 
   useEffect(() => {
     if (grupo) { setAula(grupo.aula ?? ""); setHorario(grupo.horario ?? ""); }

@@ -11,6 +11,7 @@ use App\Models\Materia;
 use App\Models\Postulante;
 use Illuminate\Support\Facades\DB;
 
+
 /**
  * Servicio de generación automática de grupos (UC-14).
  *

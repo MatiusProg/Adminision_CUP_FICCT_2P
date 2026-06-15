@@ -130,6 +130,7 @@ class UserController extends Controller
         return new UserResource($user->fresh());
     }
 
+    
     /**
      * Desactiva lógicamente un usuario (activo = false).
      * No se permite auto-desactivarse ni desactivar al único admin.

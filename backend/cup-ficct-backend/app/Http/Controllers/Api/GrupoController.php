@@ -102,6 +102,7 @@ class GrupoController extends Controller
         ]);
     }
 
+    
     /**
      * Ejecuta el algoritmo CEIL para generar grupos automáticamente (UC-14).
      * Ruta: POST /api/grupos/generar

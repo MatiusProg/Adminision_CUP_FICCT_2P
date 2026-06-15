@@ -1,0 +1,39 @@
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=cup_ficct_db
+DB_USERNAME=postgres
+DB_PASSWORD=291022
+
+Cambiar por estos., en lugar de la compartida, reemplazar por lo de arriba y BORRAR ESTA LINEA
+
+Enlace pag:
+	https://frontend-production-6a05.up.railway.app/
+	
+	
+contra proyecto supabase:
+	CupSi12026KarenyMateo
+API KEY de RESEND:
+	re_F9Enjaf4_Pera3wEWLBgse7326riXkgt2
+	
+4 postulantes demo con emails/contrasenas conocidos:
+ *   postulante1@cup-test.local / CI: 10000001 -> todas las gestiones
+ *   postulante2@cup-test.local / CI: 10000002 -> 2025-2, 2026-1, 2026-2
+ *   postulante3@cup-test.local / CI: 10000003 -> 2026-1, 2026-2
+ *   postulante4@cup-test.local / CI: 10000004 -> solo 2026-2
+ 
+ *docente: mariolopezwinnie@gmail.com  ----  mario321$
+ 
+	
+	
+
+# Volver a inscripciones_abiertas (después de pruebas)
+DB::statement("UPDATE gestiones SET estado = 'inscripciones_abiertas' WHERE es_actual = TRUE")
+
+# Limpiar grupos/inscripciones/exámenes de prueba
+$gid = DB::table('gestiones')->whereRaw('"es_actual" = TRUE')->value('id')
+DB::table('notas')->where('gestion_id', $gid)->delete()
+DB::table('inscripciones')->where('gestion_id', $gid)->delete()
+DB::table('grupos')->where('gestion_id', $gid)->delete()
+DB::table('examenes')->where('gestion_id', $gid)->delete()
+

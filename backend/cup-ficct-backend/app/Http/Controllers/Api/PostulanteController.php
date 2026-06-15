@@ -11,15 +11,6 @@ use App\Services\AuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-/**
- * Gestión de postulantes (UC-04 listar/buscar, UC-05 editar/eliminar).
- *
- * NOTA IMPORTANTE: no existe método store(). En el Ciclo 1 el postulante se
- * crea ÚNICAMENTE en el webhook de Stripe tras un pago exitoso (ver PagoController
- * y PagoStripeService). Antes del pago los datos viven solo en el frontend.
- *
- * Todos los listados se filtran por la gestión activa (Gestion::actual()).
- */
 class PostulanteController extends Controller
 {
     public function __construct(private AuditService $audit)

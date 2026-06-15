@@ -227,6 +227,7 @@ class ReporteController extends Controller
             3 => (float) \App\Models\ConfiguracionSistema::obtener('peso_examen_3', 40),
         ];
 
+    
         $materias = $materiaId
             ? Materia::where('id', $materiaId)->get()
             : Materia::orderBy('id')->get();

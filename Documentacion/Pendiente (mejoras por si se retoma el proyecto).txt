@@ -1,0 +1,7 @@
+Pendiente (mejoras por si se retoma el proyecto):
+* Mejorar los reportes, aumentando a los docentes, pudiendo visualizar la cant de aprobados por docente
+  Ademas de poder hacer comparativas entre gestiones
+  
+* Mejorar las opciones que puede generar los reportes mediante el chat de voz...
+
+* Implementar el poder visualizar la bitacora...

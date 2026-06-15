@@ -180,6 +180,7 @@ class DocenteController extends Controller
         return new DocenteResource($docente->fresh());
     }
 
+    
     /**
      * Desactiva lógicamente un docente.
      * También desactiva su cuenta de usuario si tiene una.
