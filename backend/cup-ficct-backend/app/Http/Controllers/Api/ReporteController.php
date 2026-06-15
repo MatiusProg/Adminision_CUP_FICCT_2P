@@ -78,6 +78,14 @@ class ReporteController extends Controller
         $tipo = $request->query('tipo', 'postulantes');
         $data = $this->obtenerDatos($tipo, $request, $gestion);
 
+        // DomPDF tiene límite de memoria con grandes volúmenes.
+        // Restringir a 200 registros — para más usar Excel.
+        $limite   = 200;
+        $truncado = count($data) > $limite;
+        if ($truncado) {
+            $data = array_slice($data, 0, $limite);
+        }
+
         $titulos = [
             'postulantes' => 'Reporte de Postulantes',
             'resultados'  => 'Reporte de Resultados y Admisión',
@@ -85,14 +93,16 @@ class ReporteController extends Controller
         ];
 
         $pdf = Pdf::loadView("reportes.{$tipo}", [
-            'data'    => $data,
-            'gestion' => $gestion,
-            'titulo'  => $titulos[$tipo] ?? 'Reporte CUP-FICCT',
-            'filtros' => $this->describeFiltros($request),
+            'data'     => $data,
+            'gestion'  => $gestion,
+            'titulo'   => $titulos[$tipo] ?? 'Reporte CUP-FICCT',
+            'filtros'  => $this->describeFiltros($request),
+            'truncado' => $truncado,  // ← pasar al blade
+            'limite'   => $limite,
         ])->setPaper('a4', 'landscape');
 
         $this->audit->log('generar_reporte_pdf', 'Gestion', $gestion->id, [
-            'tipo' => $tipo, 'total' => count($data),
+            'tipo' => $tipo, 'total' => count($data), 'truncado' => $truncado,
         ], $request);
 
         $nombre = "reporte_{$tipo}_{$gestion->codigo}.pdf";
@@ -221,10 +231,17 @@ class ReporteController extends Controller
             ? Materia::where('id', $materiaId)->get()
             : Materia::orderBy('id')->get();
 
-        $postulantes = Postulante::where('gestion_id', $gestion->id)
+        // Construir query base con filtro de estado opcional.
+        $query = Postulante::where('gestion_id', $gestion->id)
             ->whereIn('estado', ['confirmado', 'aprobado', 'reprobado', 'admitido', 'no_admitido'])
-            ->orderBy('apellidos')
-            ->get(['id', 'ci', 'nombres', 'apellidos', 'estado']);
+            ->orderBy('apellidos');
+
+        // Aplicar filtro de estado si se especificó en los parámetros.
+        if ($estado = $request->query('estado')) {
+            $query->where('estado', $estado);
+        }
+
+        $postulantes = $query->get(['id', 'ci', 'nombres', 'apellidos', 'estado']);
 
         $resultado = [];
 
